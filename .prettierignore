@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+build
+dist
+public
+*.ico
+*.svg
+*.png
+*.jpg
+*.jpeg
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
