@@ -23,18 +23,18 @@ interface BadgeProps {
 const Badge: React.FC<BadgeProps> = ({
   variant = "light",
   color = "primary",
-  size = "md",
+  size = "sm",
   startIcon,
   endIcon,
   children,
 }) => {
   const baseStyles =
-    "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium";
+    "inline-flex items-center px-2 py-0.5 justify-center gap-1 rounded-full font-medium";
 
   // Define size styles
   const sizeStyles = {
-    sm: "text-theme-xs", // Smaller padding and font size
-    md: "text-sm", // Default padding and font size
+    sm: "text-[10px]", // Smaller padding and font size
+    md: "text-xs", // Default padding and font size
   };
 
   // Define color styles for variants

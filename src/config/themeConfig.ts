@@ -19,8 +19,8 @@ export const themeConfig = {
   },
   // Border radius
   borderRadius: {
-    base: "0.75rem", // 12px
-    large: "1rem", // 16px
+    base: "0.2rem", 
+    large: "0.5rem", 
   },
   // Theme colors
   colors: {
