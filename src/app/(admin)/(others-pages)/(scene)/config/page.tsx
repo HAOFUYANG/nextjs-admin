@@ -165,176 +165,172 @@ const Config: React.FC = () => {
       <PageBreadcrumb pageTitle="配置列表" />
 
       <div className="space-y-6">
-        {/* 搜索表单 */}
-        <ComponentCard title="搜索查询">
-          <form onSubmit={handleSearch}>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-              <div>
-                <Label htmlFor="name">名称</Label>
-                <Input
-                  id="name"
-                  placeholder="名称模糊匹配"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="version">版本</Label>
-                <Input
-                  id="version"
-                  placeholder="精确版本"
-                  value={version}
-                  onChange={(e) => setVersion(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="appId">应用 ID</Label>
-                <Input
-                  id="appId"
-                  placeholder="精确应用ID"
-                  value={appId}
-                  onChange={(e) => setAppId(e.target.value)}
-                />
-              </div>
-            </div>
 
-            <div className="flex justify-end gap-3 mt-6">
-              <Button type="submit" disabled={loading}>
-                {loading ? "查询中..." : "查询"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleReset}
-                disabled={loading}
-              >
-                重置
-              </Button>
-            </div>
-          </form>
-        </ComponentCard>
 
-        {/* 列表展示 */}
-        <ComponentCard title="配置数据">
-          <div className="flex justify-end mb-4">
-            <Button onClick={() => router.push("/table/new")}>新建配置</Button>
+        <form onSubmit={handleSearch}>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div>
+              <Label htmlFor="name">名称</Label>
+              <Input
+                id="name"
+                placeholder="名称模糊匹配"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="version">版本</Label>
+              <Input
+                id="version"
+                placeholder="精确版本"
+                value={version}
+                onChange={(e) => setVersion(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="appId">应用 ID</Label>
+              <Input
+                id="appId"
+                placeholder="精确应用ID"
+                value={appId}
+                onChange={(e) => setAppId(e.target.value)}
+              />
+            </div>
           </div>
 
-          {error && (
-            <div className="p-4 mb-4 text-sm text-red-500 bg-red-50 rounded-lg dark:bg-red-900/20 dark:text-red-400">
-              {error}
-            </div>
-          )}
-
-          <div className="max-w-full overflow-x-auto">
-            <Table>
-              <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
-                <TableRow>
-                  <TableCell
-                    isHeader
-                    className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    名称
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    版本
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    涉及应用
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    创建时间
-                  </TableCell>
-                  <TableCell
-                    isHeader
-                    className="py-3 px-5 text-end text-sm font-medium text-gray-500 dark:text-gray-400"
-                  >
-                    操作
-                  </TableCell>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {list.map((item) => {
-                  const meta = appLinks.find((x) => x.id === item.id);
-                  return (
-                    <TableRow key={item.id ?? item.name}>
-                      <TableCell className="py-4 px-5 text-sm text-gray-800 dark:text-white/90">
-                        {item.name}
-                      </TableCell>
-                      <TableCell className="py-4 px-5 text-sm text-gray-500 dark:text-gray-400">
-                        {item.version}
-                      </TableCell>
-                      <TableCell className="py-4 px-5 text-sm text-gray-500 dark:text-gray-400">
-                        <div className="flex flex-wrap gap-2">
-                          {meta?.ids.map((id) => (
-                            <NextLink
-                              key={id}
-                              href={`/apps/${id}`}
-                              className="text-brand-500 hover:underline"
-                            >
-                              {meta.label && meta.ids.length === 1
-                                ? meta.label
-                                : id}
-                            </NextLink>
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-4 px-5 text-sm text-gray-500 dark:text-gray-400">
-                        {formatCNDateTime(item.createTime)}
-                      </TableCell>
-                      <TableCell className="py-4 px-5 text-end">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleUpdate(item)}
-                          >
-                            编辑
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDetail(item)}
-                          >
-                            详情
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                            onClick={() => openDeleteModal(item)}
-                          >
-                            删除
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+          <div className="flex justify-end gap-3 mt-6">
+            <Button type="submit" disabled={loading}>
+              {loading ? "查询中..." : "查询"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleReset}
+              disabled={loading}
+            >
+              重置
+            </Button>
           </div>
+        </form>
 
-          <div className="flex justify-between items-center mt-6">
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {loading ? "加载中..." : `共 ${list.length} 条数据`}
-            </div>
-            <Pagination
-              currentPage={page}
-              totalPages={list.length >= pageSize ? page + 1 : page}
-              onPageChange={handlePageChange}
-            />
+        <div className="flex justify-end mb-4">
+          <Button onClick={() => router.push("/config/new")}>新建配置</Button>
+        </div>
+
+        {error && (
+          <div className="p-4 mb-4 text-sm text-red-500 bg-red-50 rounded-lg dark:bg-red-900/20 dark:text-red-400">
+            {error}
           </div>
-        </ComponentCard>
+        )}
+
+        <div className="max-w-full overflow-x-auto">
+          <Table>
+            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+              <TableRow>
+                <TableCell
+                  isHeader
+                  className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  名称
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  版本
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  涉及应用
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  创建时间
+                </TableCell>
+                <TableCell
+                  isHeader
+                  className="py-3 px-5 text-end text-sm font-medium text-gray-500 dark:text-gray-400"
+                >
+                  操作
+                </TableCell>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {list.map((item) => {
+                const meta = appLinks.find((x) => x.id === item.id);
+                return (
+                  <TableRow key={item.id ?? item.name}>
+                    <TableCell className="py-4 px-5 text-sm text-gray-800 dark:text-white/90">
+                      {item.name}
+                    </TableCell>
+                    <TableCell className="py-4 px-5 text-sm text-gray-500 dark:text-gray-400">
+                      {item.version}
+                    </TableCell>
+                    <TableCell className="py-4 px-5 text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex flex-wrap gap-2">
+                        {meta?.ids.map((id) => (
+                          <NextLink
+                            key={id}
+                            href={`/apps/${id}`}
+                            className="text-brand-500 hover:underline"
+                          >
+                            {meta.label && meta.ids.length === 1
+                              ? meta.label
+                              : id}
+                          </NextLink>
+                        ))}
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-4 px-5 text-sm text-gray-500 dark:text-gray-400">
+                      {formatCNDateTime(item.createTime)}
+                    </TableCell>
+                    <TableCell className="py-4 px-5 text-end">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleUpdate(item)}
+                        >
+                          编辑
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDetail(item)}
+                        >
+                          详情
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          onClick={() => openDeleteModal(item)}
+                        >
+                          删除
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div className="flex justify-between items-center mt-6">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {loading ? "加载中..." : `共 ${list.length} 条数据`}
+          </div>
+          <Pagination
+            currentPage={page}
+            totalPages={list.length >= pageSize ? page + 1 : page}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </div>
 
       {/* 删除确认 Modal */}

@@ -5,6 +5,7 @@ import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { LayoutConfigHandler } from '@/config/LayoutConfigHandler';
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner";
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -17,16 +18,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const globalStyles = {
-    "--radius": "6px",
-  } as React.CSSProperties;
-
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)} style={globalStyles}>
+    <html lang="en" className={cn("font-sans", geist.variable)} >
       <body className={`${outfit.className} dark:bg-gray-900`}>
         <ThemeProvider>
           <LayoutConfigHandler />
           <SidebarProvider>{children}</SidebarProvider>
+          <Toaster richColors position="top-center" />
         </ThemeProvider>
       </body>
     </html>
