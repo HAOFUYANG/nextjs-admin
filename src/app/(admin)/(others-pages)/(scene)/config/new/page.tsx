@@ -189,7 +189,7 @@ export default function NewConfig() {
   };
 
   const handleCancel = () => {
-    router.push("/table");
+    router.push("/config");
   };
 
   const pageTitle = isEdit ? "编辑配置" : isDetail ? "详情" : "新增配置";
@@ -197,95 +197,92 @@ export default function NewConfig() {
   return (
     <div className="mx-auto max-w-7xl">
       <PageBreadcrumb pageTitle={pageTitle} />
-
       <div className="space-y-6">
-        <ComponentCard title={pageTitle}>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <Label>名称</Label>
-              <Input
-                placeholder="请输入"
-                disabled={!!isEdit || !!isDetail}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <Label>名称</Label>
+            <Input
+              placeholder="请输入"
+              disabled={!!isEdit || !!isDetail}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
 
-            <div>
-              <Label>版本</Label>
-              <Input
-                placeholder="请输入"
-                disabled={!!isDetail}
-                value={version}
-                onChange={(e) => setVersion(e.target.value)}
-              />
-            </div>
+          <div>
+            <Label>版本</Label>
+            <Input
+              placeholder="请输入"
+              disabled={!!isDetail}
+              value={version}
+              onChange={(e) => setVersion(e.target.value)}
+            />
+          </div>
 
-            <div>
-              <Label>应用</Label>
-              <Select
-                value={appId}
-                onChange={(v) => handleChangeAppId(v)}
-                disabled={!!isDetail}
-                placeholder="请选择应用"
-                options={appIdOptions.map((item) => ({
-                  value: item.appId,
-                  label: item.appName,
-                }))}
-              />
-            </div>
+          <div>
+            <Label>应用</Label>
+            <Select
+              value={appId}
+              onChange={(v) => handleChangeAppId(v)}
+              disabled={!!isDetail}
+              placeholder="请选择应用"
+              options={appIdOptions.map((item) => ({
+                value: item.appId,
+                label: item.appName,
+              }))}
+            />
+          </div>
 
-            {!isDetail ? (
-              <div>
-                <Label>配置文件</Label>
-                <div className="flex gap-2 items-center flex-wrap">
-                  <input
-                    type="file"
-                    onChange={(e) => handleFileChange(e)}
-                    className="h-9 w-full rounded-(--border-radius-base) border border-gray-300 px-3 py-1.5 text-xs shadow-theme-xs dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
-                  />
+          {!isDetail ? (
+            <div>
+              <Label>配置文件</Label>
+              <div className="flex gap-2 items-center flex-wrap">
+                <input
+                  type="file"
+                  onChange={(e) => handleFileChange(e)}
+                  className="h-9 rounded-lg border border-gray-300 px-3 py-1.5 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
+                />
+                <Button
+                  type="button"
+                  onClick={handleUpload}
+                  disabled={isUploading || !file}
+                >
+                  {isUploading ? "上传中..." : "上传"}
+                </Button>
+              </div>
+
+              {uploadedInfo ? (
+                <div className="flex items-center gap-2 flex-wrap mt-2">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    已上传：{uploadedInfo.filename}
+                  </span>
                   <Button
-                    type="button"
-                    onClick={handleUpload}
-                    disabled={isUploading || !file}
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleDownload(uploadedInfo)}
                   >
-                    {isUploading ? "上传中..." : "上传"}
+                    <Download className="w-4 h-4" />
                   </Button>
                 </div>
+              ) : null}
+            </div>
+          ) : null}
 
-                {uploadedInfo ? (
-                  <div className="flex items-center gap-2 flex-wrap mt-2">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      已上传：{uploadedInfo.filename}
-                    </span>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDownload(uploadedInfo)}
-                    >
-                      <Download className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-
-            {!isDetail ? (
-              <div className="flex justify-end gap-3">
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "提交中..." : "提交"}
-                </Button>
-                <Button
-                  variant="outline"
-                  type="button"
-                  onClick={handleCancel}
-                >
-                  取消
-                </Button>
-              </div>
-            ) : null}
-          </form>
-        </ComponentCard>
+          {!isDetail ? (
+            <div className="flex justify-end gap-3">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "提交中..." : "提交"}
+              </Button>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={handleCancel}
+              >
+                取消
+              </Button>
+            </div>
+          ) : null}
+        </form>
       </div>
     </div>
   );

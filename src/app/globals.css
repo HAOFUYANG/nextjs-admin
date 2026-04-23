@@ -175,8 +175,6 @@
   --main-padding: 1.25rem;
   --main-padding-md: 1rem;
   --section-gap: 1.5rem;
-  /* --border-radius-base: var(--radius, 6px); */
-  /* --border-radius-large: var(--radius, 8px); */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -274,7 +272,7 @@
 }
 
 @utility menu-dropdown-badge {
-  @apply block rounded-full px-2.5 py-0.5 text-xs font-medium uppercase text-brand-500 dark:text-brand-400;
+  @apply block rounded-full px-2.5 py-0.5 text-sm font-medium uppercase text-brand-500 dark:text-brand-400;
 }
 
 @utility menu-dropdown-badge-active {

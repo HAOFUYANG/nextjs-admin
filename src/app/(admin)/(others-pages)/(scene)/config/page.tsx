@@ -292,7 +292,6 @@ const Config: React.FC = () => {
                       <div className="flex justify-end gap-2">
                         <Button
                           size="sm"
-                          variant="outline"
                           onClick={() => handleUpdate(item)}
                         >
                           编辑

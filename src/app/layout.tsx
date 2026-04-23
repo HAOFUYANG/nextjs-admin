@@ -3,7 +3,6 @@ import './globals.css';
 import "flatpickr/dist/flatpickr.css";
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
-import { LayoutConfigHandler } from '@/config/LayoutConfigHandler';
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -22,7 +21,6 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", geist.variable)} >
       <body className={`${outfit.className} dark:bg-gray-900`}>
         <ThemeProvider>
-          <LayoutConfigHandler />
           <SidebarProvider>{children}</SidebarProvider>
           <Toaster richColors position="top-center" />
         </ThemeProvider>
