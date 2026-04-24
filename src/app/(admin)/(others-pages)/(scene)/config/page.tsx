@@ -192,10 +192,11 @@ const Config: React.FC = () => {
                 onChange={(e) => setAppId(e.target.value)}
               />
             </div>
-            <div className="mt-6">
-              <div className="flex justify-start gap-3"><Button type="submit" disabled={loading}>
-                {loading ? "查询中..." : "查询"}
-              </Button>
+            <div className="  mt-6">
+              <div className="flex justify-start gap-3">
+                <Button type="submit">
+                  查询
+                </Button>
                 <Button
                   type="button"
                   variant="outline"
