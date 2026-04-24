@@ -3,21 +3,30 @@ import React, { useEffect, useMemo, useState, useCallback } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import type { Table as DbTable } from "@/lib/schema";
-
-// 项目 UI 组件
-import Button from "@/components/ui/button/Button";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableHeader,
   TableBody,
+  TableHead,
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
+import { Input } from "@/components/ui/input";
+import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Modal } from "@/components/ui/modal";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import Pagination from "@/components/tables/Pagination";
+import {
+  Pagination as PaginationNav,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 type TableListItem = DbTable & {
   appName?: string | null;
@@ -97,12 +106,12 @@ const Config: React.FC = () => {
 
   const handleUpdate = (row: TableListItem) => {
     if (!row?.id) return;
-    router.push(`/table/new?id=${row.id}&isEdit=true`);
+    router.push(`/config/new?id=${row.id}&isEdit=true`);
   };
 
   const handleDetail = (row: TableListItem) => {
     if (!row?.id) return;
-    router.push(`/table/new?id=${row.id}&isEdit=false`);
+    router.push(`/config/new?id=${row.id}&isEdit=false`);
   };
 
   const openDeleteModal = (row: TableListItem) => {
@@ -118,12 +127,11 @@ const Config: React.FC = () => {
       });
       const json = await res.json();
       if (json?.errno === 0) {
+        toast.success("删除成功");
         fetchList();
-      } else {
-        setError(json?.message || "删除失败");
       }
     } catch {
-      setError("网络错误，请稍后重试");
+      toast.error("删除失败");
     } finally {
       setIsDeleteModalOpen(false);
       setDeletingRow(null);
@@ -165,47 +173,52 @@ const Config: React.FC = () => {
       <div className="space-y-6">
         <form onSubmit={handleSearch}>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
-            <div>
-              <Label htmlFor="name">名称</Label>
-              <Input
-                id="name"
-                placeholder="请输入"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="version">版本</Label>
-              <Input
-                id="version"
-                placeholder="请输入"
-                value={version}
-                onChange={(e) => setVersion(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label htmlFor="appId">应用 ID</Label>
-              <Input
-                id="appId"
-                placeholder="请输入"
-                value={appId}
-                onChange={(e) => setAppId(e.target.value)}
-              />
-            </div>
-            <div className="  mt-6">
-              <div className="flex justify-start gap-3">
-                <Button type="submit">
-                  查询
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleReset}
-                  disabled={loading}
-                >
-                  重置
-                </Button></div>
-
+            <FieldGroup>
+              <FieldSet>
+                <FieldGroup className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="name">名称</FieldLabel>
+                    <Input
+                      id="name"
+                      placeholder="请输入"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="version">版本</FieldLabel>
+                    <Input
+                      id="version"
+                      placeholder="请输入"
+                      value={version}
+                      onChange={(e) => setVersion(e.target.value)}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="appId">应用 ID</FieldLabel>
+                    <Input
+                      id="appId"
+                      placeholder="请输入"
+                      value={appId}
+                      onChange={(e) => setAppId(e.target.value)}
+                    />
+                  </Field>
+                </FieldGroup>
+              </FieldSet>
+            </FieldGroup>
+            <div className="flex items-center gap-3">
+              <Button type="submit" size="sm" disabled={loading}>
+                查询
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleReset}
+                disabled={loading}
+              >
+                重置
+              </Button>
             </div>
           </div>
 
@@ -213,69 +226,50 @@ const Config: React.FC = () => {
         </form>
 
         <div className="flex justify-end mb-4">
-          <Button onClick={() => router.push("/config/new")}>新建配置</Button>
+          <Button size="sm" onClick={() => router.push("/config/new")}>新建配置</Button>
         </div>
 
         {error && (
-          <div className="p-4 mb-4 text-sm text-red-500 bg-red-50 rounded-lg dark:bg-red-900/20 dark:text-red-400">
+          <div className="p-4 mb-4 text-sm text-destructive bg-destructive/10 rounded-lg">
             {error}
           </div>
         )}
 
         <div className="max-w-full overflow-x-auto">
           <Table>
-            <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+            <TableHeader>
               <TableRow>
-                <TableCell
-                  isHeader
-                  className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                  名称
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                  版本
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                  涉及应用
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 px-5 text-start text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                  创建时间
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="py-3 px-5 text-end text-sm font-medium text-gray-500 dark:text-gray-400"
-                >
-                  操作
-                </TableCell>
+                <TableHead>名称</TableHead>
+                <TableHead>版本</TableHead>
+                <TableHead>涉及应用</TableHead>
+                <TableHead>创建时间</TableHead>
+                <TableHead className="text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody className="divide-y divide-gray-100 dark:divide-gray-800">
-              {list.map((item) => {
+            <TableBody>
+              {loading ? (
+                <TableRow>
+                  <TableCell className="py-20 text-center" colSpan={5}>
+                    <Spinner className="h-5 w-5 mx-auto text-primary" />
+                  </TableCell>
+                </TableRow>
+              ) : (list.map((item) => {
                 const meta = appLinks.find((x) => x.id === item.id);
                 return (
                   <TableRow key={item.id ?? item.name}>
-                    <TableCell className="py-4 px-5 text-sm text-gray-800 dark:text-white/90">
+                    <TableCell className="font-medium">
                       {item.name}
                     </TableCell>
-                    <TableCell className="py-4 px-5 text-sm text-gray-500 dark:text-gray-400">
+                    <TableCell>
                       {item.version}
                     </TableCell>
-                    <TableCell className="py-4 px-5 text-sm text-gray-500 dark:text-gray-400">
+                    <TableCell>
                       <div className="flex flex-wrap gap-2">
                         {meta?.ids.map((id) => (
                           <NextLink
                             key={id}
-                            href={`/apps/${id}`}
-                            className="text-brand-500 hover:underline"
+                            href={`/config/apps/${id}`}
+                            className="text-primary hover:underline"
                           >
                             {meta.label && meta.ids.length === 1
                               ? meta.label
@@ -284,10 +278,10 @@ const Config: React.FC = () => {
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className="py-4 px-5 text-sm text-gray-500 dark:text-gray-400">
+                    <TableCell>
                       {formatCNDateTime(item.createTime)}
                     </TableCell>
-                    <TableCell className="py-4 px-5 text-end">
+                    <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button
                           size="sm"
@@ -304,8 +298,7 @@ const Config: React.FC = () => {
                         </Button>
                         <Button
                           size="sm"
-                          variant="outline"
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          variant="destructive"
                           onClick={() => openDeleteModal(item)}
                         >
                           删除
@@ -314,20 +307,70 @@ const Config: React.FC = () => {
                     </TableCell>
                   </TableRow>
                 );
-              })}
+              }))}
+
             </TableBody>
           </Table>
         </div>
 
         <div className="flex justify-between items-center mt-6">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {loading ? "加载中..." : `共 ${list.length} 条数据`}
+          <div className="text-sm text-muted-foreground">
+            {`共 ${list.length} 条数据`}
           </div>
-          <Pagination
-            currentPage={page}
-            totalPages={list.length >= pageSize ? page + 1 : page}
-            onPageChange={handlePageChange}
-          />
+          <PaginationNav>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                    e.preventDefault();
+                    if (page > 1) handlePageChange(page - 1);
+                  }}
+                  aria-disabled={page <= 1}
+                  className={page <= 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              {page > 3 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              {Array.from(
+                { length: Math.min(3, list.length >= pageSize ? page + 1 : page) },
+                (_, i) => i + Math.max(page - 1, 1),
+              ).map((p) => (
+                <PaginationItem key={p}>
+                  <PaginationLink
+                    href="#"
+                    onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                      e.preventDefault();
+                      handlePageChange(p);
+                    }}
+                    isActive={page === p}
+                  >
+                    {p}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              {page < (list.length >= pageSize ? page + 1 : page) - 2 && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                    e.preventDefault();
+                    const totalPages = list.length >= pageSize ? page + 1 : page;
+                    if (page < totalPages) handlePageChange(page + 1);
+                  }}
+                  aria-disabled={page >= (list.length >= pageSize ? page + 1 : page)}
+                  className={page >= (list.length >= pageSize ? page + 1 : page) ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </PaginationNav>
         </div>
       </div>
 
@@ -348,11 +391,12 @@ const Config: React.FC = () => {
             </span>
           </p>
           <div className="flex justify-center gap-3">
-            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
+            <Button variant="outline" size="sm" onClick={() => setIsDeleteModalOpen(false)}>
               取消
             </Button>
             <Button
-              className="bg-red-500 hover:bg-red-600 text-white"
+              variant="destructive"
+              size="sm"
               onClick={handleDelete}
             >
               确定删除
@@ -360,7 +404,7 @@ const Config: React.FC = () => {
           </div>
         </div>
       </Modal>
-    </div>
+    </div >
   );
 };
 

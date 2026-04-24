@@ -4,12 +4,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Download, Trash } from "lucide-react";
 import { toast } from "sonner";
 import type { AppInfo } from "@/lib/schema";
-import Button from "@/components/ui/button/Button";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
-import Select from "@/components/form/Select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-
+import { Spinner } from "@/components/ui/spinner";
 export default function NewConfig() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -17,9 +23,10 @@ export default function NewConfig() {
   const isEdit = searchParams.get("isEdit") === "true";
   const isDetail = !isEdit && id;
   const isAdd = !searchParams.get("id");
+  const [loading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [version, setVersion] = useState("");
-  const [appId, setAppId] = useState("");
+  const [appId, setAppId] = useState<string>("");
   const [appIdOptions, setAppIdOptions] = useState<AppInfo[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -36,7 +43,8 @@ export default function NewConfig() {
         return;
       }
       try {
-        const res = await fetch(`/api/table/${id}`);
+        setLoading(true)
+        const res = await fetch(`/api/config/${id}`);
         const data = await res.json();
         if (res.ok && data?.errno === 0) {
           const { name, version, appId, configFileInfo } = data.data;
@@ -56,6 +64,8 @@ export default function NewConfig() {
         }
       } catch {
         toast.error("获取详情失败");
+      } finally {
+        setLoading(false)
       }
     };
     getAppIdOptions();
@@ -75,8 +85,8 @@ export default function NewConfig() {
       toast.error(e instanceof Error ? e.message : "获取应用失败");
     }
   };
-  const handleChangeAppId = (e: string) => {
-    setAppId(e);
+  const handleChangeAppId = (e: string | null) => {
+    setAppId(e ?? "");
   };
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] ?? null);
@@ -203,93 +213,120 @@ export default function NewConfig() {
 
   return (
     <div className="mx-auto max-w-7xl">
-      <PageBreadcrumb pageTitle={pageTitle} />
-      <div className="space-y-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <Label>名称</Label>
-            <Input
-              placeholder="请输入"
-              disabled={!!isEdit || !!isDetail}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+      <PageBreadcrumb pageTitle={pageTitle} parentTitle="配置列表" parentHref="/config" />
+      <div className="space-y-6 pl-10 pr-10">
+        {loading && !isAdd ? (
+          <div className="flex items-center justify-center h-60">
+            <Spinner className="h-5 w-5 mx-auto size-6 text-primary" />
           </div>
+        ) : (<form onSubmit={handleSubmit} className="space-y-6">
+          <FieldGroup>
+            <FieldSet>
+              <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="name">名称</FieldLabel>
+                  <Input
+                    id="name"
+                    placeholder="请输入"
+                    disabled={!!isEdit || !!isDetail}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </Field>
 
-          <div>
-            <Label>版本</Label>
-            <Input
-              placeholder="请输入"
-              disabled={!!isDetail}
-              value={version}
-              onChange={(e) => setVersion(e.target.value)}
-            />
-          </div>
+                <Field>
+                  <FieldLabel htmlFor="version">版本</FieldLabel>
+                  <Input
+                    id="version"
+                    placeholder="请输入"
+                    disabled={!!isDetail}
+                    value={version}
+                    onChange={(e) => setVersion(e.target.value)}
+                  />
+                </Field>
+              </FieldGroup>
+            </FieldSet>
+          </FieldGroup>
 
-          <div>
-            <Label>应用</Label>
-            <Select
-              value={appId}
-              onChange={(v) => handleChangeAppId(v)}
-              disabled={!!isDetail}
-              placeholder="请选择应用"
-              options={appIdOptions.map((item) => ({
-                value: item.appId,
-                label: item.appName,
-              }))}
-            />
-          </div>
-
-          {!isDetail ? (
-            <div>
-              <Label>配置文件</Label>
-              <div className="flex gap-2 items-center flex-wrap">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  onChange={(e) => handleFileChange(e)}
-                  className="h-9 rounded-lg border border-gray-300 px-3 py-1.5 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
-                />
-                <Button
-                  type="button"
-                  onClick={handleUpload}
-                  disabled={isUploading || !file}
-                >
-                  {isUploading ? "上传中..." : "上传"}
-                </Button>
-              </div>
-
-              {uploadedInfo ? (
-                <div className="flex items-center gap-2 flex-wrap mt-2">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    已上传：{uploadedInfo.filename}
-                  </span>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDownload(uploadedInfo)}
+          <FieldGroup>
+            <FieldSet>
+              <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel htmlFor="appId">应用</FieldLabel>
+                  <Select
+                    value={appId}
+                    onValueChange={(v) => handleChangeAppId(v)}
+                    disabled={!!isDetail}
                   >
-                    <Download className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => handleDeleteFile()}
-                  >
-                    <Trash className="w-4 h-4" />
-                  </Button>
-                </div>
-              ) : null}
-            </div>
-          ) : null}
+                    <SelectTrigger className="w-full" id="appId">
+                      <SelectValue placeholder="请选择应用" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {appIdOptions.map((item) => (
+                        <SelectItem key={item.appId} value={item.appId}>
+                          {item.appName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+
+                {!isDetail ? (
+                  <Field>
+                    <FieldLabel htmlFor="configFile">配置文件</FieldLabel>
+                    <div className="flex gap-2 items-center flex-wrap">
+                      <Input
+                        id="configFile"
+                        ref={fileInputRef}
+                        type="file"
+                        onChange={(e) => handleFileChange(e)}
+                        className="max-w-xs"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={handleUpload}
+                        disabled={isUploading || !file}
+                      >
+                        {isUploading ? "上传中..." : "上传"}
+                      </Button>
+                    </div>
+
+                    {uploadedInfo ? (
+                      <div className="flex items-center gap-2 flex-wrap mt-2">
+                        <span className="text-sm text-muted-foreground">
+                          已上传：{uploadedInfo.filename}
+                        </span>
+                        <Button
+                          size="icon-xs"
+                          variant="outline"
+                          onClick={() => handleDownload(uploadedInfo)}
+                        >
+                          <Download className="size-3.5" />
+                        </Button>
+                        <Button
+                          size="icon-xs"
+                          variant="destructive"
+                          onClick={() => handleDeleteFile()}
+                        >
+                          <Trash className="size-3.5" />
+                        </Button>
+                      </div>
+                    ) : null}
+                  </Field>
+                ) : null}
+              </FieldGroup>
+            </FieldSet>
+          </FieldGroup>
 
           {!isDetail ? (
             <div className="flex justify-end gap-3">
-              <Button type="submit" disabled={isSubmitting || !uploadedInfo?.id}>
+              <Button type="submit" size="sm" disabled={isSubmitting || !uploadedInfo?.id}>
                 {isSubmitting ? "提交中..." : "提交"}
               </Button>
               <Button
                 variant="outline"
+                size="sm"
                 type="button"
                 onClick={handleCancel}
               >
@@ -297,7 +334,8 @@ export default function NewConfig() {
               </Button>
             </div>
           ) : null}
-        </form>
+        </form>)}
+
       </div>
     </div>
   );
