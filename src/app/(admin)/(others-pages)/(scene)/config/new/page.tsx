@@ -1,14 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Download } from "lucide-react";
+import { Download, Trash } from "lucide-react";
 import { toast } from "sonner";
 import type { AppInfo } from "@/lib/schema";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Select from "@/components/form/Select";
-import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 
 export default function NewConfig() {
@@ -28,6 +27,7 @@ export default function NewConfig() {
     id: string;
     filename: string;
   } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -144,6 +144,13 @@ export default function NewConfig() {
       toast.error(error instanceof Error ? error.message : "下载文件失败");
     }
   };
+  const handleDeleteFile = () => {
+    setUploadedInfo(null);
+    setFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name.trim() || !version.trim() || !appId.trim()) {
@@ -152,7 +159,7 @@ export default function NewConfig() {
     }
     setIsSubmitting(true);
     try {
-      const url = isEdit && id ? `/api/table/${id}` : "/api/table";
+      const url = isEdit && id ? `/api/table/${id}` : "/api/config";
       const method = isEdit ? "PUT" : "POST";
       const payload = isEdit
         ? {
@@ -179,7 +186,7 @@ export default function NewConfig() {
       if (!res.ok || data?.errno !== 0) {
         throw new Error(data?.message || "提交失败");
       }
-      router.push("/table");
+      router.push("/config");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "提交失败，请稍后重试");
       console.error("提交失败:", err);
@@ -238,6 +245,7 @@ export default function NewConfig() {
               <Label>配置文件</Label>
               <div className="flex gap-2 items-center flex-wrap">
                 <input
+                  ref={fileInputRef}
                   type="file"
                   onChange={(e) => handleFileChange(e)}
                   className="h-9 rounded-lg border border-gray-300 px-3 py-1.5 text-sm shadow-theme-xs dark:border-gray-700 dark:bg-gray-900 dark:text-white/90"
@@ -263,6 +271,13 @@ export default function NewConfig() {
                   >
                     <Download className="w-4 h-4" />
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleDeleteFile()}
+                  >
+                    <Trash className="w-4 h-4" />
+                  </Button>
                 </div>
               ) : null}
             </div>
@@ -270,7 +285,7 @@ export default function NewConfig() {
 
           {!isDetail ? (
             <div className="flex justify-end gap-3">
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || !uploadedInfo?.id}>
                 {isSubmitting ? "提交中..." : "提交"}
               </Button>
               <Button

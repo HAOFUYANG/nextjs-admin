@@ -17,7 +17,6 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import { Modal } from "@/components/ui/modal";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import ComponentCard from "@/components/common/ComponentCard";
 import Pagination from "@/components/tables/Pagination";
 
 type TableListItem = DbTable & {
@@ -163,17 +162,14 @@ const Config: React.FC = () => {
   return (
     <div className="mx-auto max-w-7xl">
       <PageBreadcrumb pageTitle="配置列表" />
-
       <div className="space-y-6">
-
-
         <form onSubmit={handleSearch}>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
             <div>
               <Label htmlFor="name">名称</Label>
               <Input
                 id="name"
-                placeholder="名称模糊匹配"
+                placeholder="请输入"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -182,7 +178,7 @@ const Config: React.FC = () => {
               <Label htmlFor="version">版本</Label>
               <Input
                 id="version"
-                placeholder="精确版本"
+                placeholder="请输入"
                 value={version}
                 onChange={(e) => setVersion(e.target.value)}
               />
@@ -191,26 +187,28 @@ const Config: React.FC = () => {
               <Label htmlFor="appId">应用 ID</Label>
               <Input
                 id="appId"
-                placeholder="精确应用ID"
+                placeholder="请输入"
                 value={appId}
                 onChange={(e) => setAppId(e.target.value)}
               />
             </div>
+            <div className="mt-6">
+              <div className="flex justify-start gap-3"><Button type="submit" disabled={loading}>
+                {loading ? "查询中..." : "查询"}
+              </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleReset}
+                  disabled={loading}
+                >
+                  重置
+                </Button></div>
+
+            </div>
           </div>
 
-          <div className="flex justify-end gap-3 mt-6">
-            <Button type="submit" disabled={loading}>
-              {loading ? "查询中..." : "查询"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleReset}
-              disabled={loading}
-            >
-              重置
-            </Button>
-          </div>
+
         </form>
 
         <div className="flex justify-end mb-4">
