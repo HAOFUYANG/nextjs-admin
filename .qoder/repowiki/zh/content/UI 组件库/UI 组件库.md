@@ -17,6 +17,13 @@
 - [src/components/form/Select.tsx](file://src/components/form/Select.tsx)
 - [src/components/user-profile/UserInfoCard.tsx](file://src/components/user-profile/UserInfoCard.tsx)
 - [src/components/user-profile/UserAddressCard.tsx](file://src/components/user-profile/UserAddressCard.tsx)
+- [src/components/ui/field.tsx](file://src/components/ui/field.tsx)
+- [src/components/ui/input.tsx](file://src/components/ui/input.tsx)
+- [src/components/ui/select.tsx](file://src/components/ui/select.tsx)
+- [src/components/ui/table.tsx](file://src/components/ui/table.tsx)
+- [src/components/ui/pagination.tsx](file://src/components/ui/pagination.tsx)
+- [src/components/ui/label.tsx](file://src/components/ui/label.tsx)
+- [src/components/ui/separator.tsx](file://src/components/ui/separator.tsx)
 - [src/app/(admin)/(ui-elements)/buttons/page.tsx](file://src/app/(admin)/(ui-elements)/buttons/page.tsx)
 - [src/app/(admin)/(ui-elements)/badge/page.tsx](file://src/app/(admin)/(ui-elements)/badge/page.tsx)
 - [src/app/(admin)/(ui-elements)/avatars/page.tsx](file://src/app/(admin)/(ui-elements)/avatars/page.tsx)
@@ -32,9 +39,11 @@
 
 ## 更新摘要
 **变更内容**
-- 更新了样式标准化改进的相关章节，包括Select组件、InputField组件、Button组件、Badge组件从text-xs到text-sm的统一升级
-- 更新了userInfoCard和userAddressCard组件的文本大小标准化说明
-- 新增了字体大小标准化的详细说明和影响范围
+- 新增现代化表单字段系统：Field、Input、Select 组件，提供更强大的表单构建能力
+- 替换旧表格组件系统，引入全新的 Table 和 Pagination 组件
+- 引入基于 Base UI 的现代化组件架构，提升可访问性和可维护性
+- 新增 FieldSet、FieldGroup、FieldContent 等表单布局组件
+- 统一使用 class-variance-authority 进行样式变体管理
 
 ## 目录
 1. [简介](#简介)
@@ -51,14 +60,23 @@
 ## 简介
 本文件系统化梳理本仓库中的 UI 组件库，覆盖基础组件（按钮、输入框、徽章）、复合组件（图表、表格、模态框）、导航组件（下拉菜单、头像）、交互组件（提示、通知），并提供 API 文档、属性说明、使用示例与样式定制要点。文档同时关注响应式设计与无障碍访问兼容性，并给出组件组合与最佳实践建议。
 
-**更新** 本版本重点反映了样式标准化改进，包括字体大小的统一升级和组件样式的规范化。
+**更新** 本版本重点反映了现代化组件架构的引入，包括全新的 Field 表单系统、基于 Base UI 的组件实现、以及更强大的表格和分页组件。
 
 ## 项目结构
-UI 组件主要位于 src/components/ui 下，按功能域拆分：button、badge、avatar、alert、modal、dropdown、table、video、sonner 等；示例页面位于 src/app 下的 UI 元素与示例区域，便于对照使用。
+UI 组件主要位于 src/components/ui 下，按功能域拆分：button、badge、avatar、alert、modal、dropdown、table、video、sonner 等；新增的现代化组件包括 field、input、select、table、pagination 等；示例页面位于 src/app 下的 UI 元素与示例区域，便于对照使用。
 
 ```mermaid
 graph TB
-subgraph "UI 组件"
+subgraph "现代化组件"
+field["表单字段系统<br/>Field/FieldSet/FieldGroup"]
+input["输入框 Input<br/>基于 Base UI"]
+select["选择框 Select<br/>基于 Base UI"]
+table["表格 Table<br/>现代化实现"]
+pagination["分页 Pagination<br/>完整实现"]
+label["标签 Label<br/>语义化标签"]
+separator["分隔线 Separator<br/>分割组件"]
+end
+subgraph "传统组件"
 btn["按钮 Button"]
 btn2["按钮 ButtonPrimitive"]
 badge["徽章 Badge"]
@@ -67,11 +85,11 @@ avatarText["头像文本 AvatarText"]
 alert["提示 Alert"]
 modal["模态框 Modal"]
 dropdown["下拉菜单 Dropdown"]
-table["表格 Table 系列"]
+tableOld["旧表格 Table 系列"]
 video["视频嵌入 YoutubeEmbed"]
 toast["通知 Toaster"]
-input["输入框 InputField"]
-select["选择框 Select"]
+inputOld["输入框 InputField"]
+selectOld["选择框 Select"]
 userInfo["用户信息卡片"]
 userAddress["用户地址卡片"]
 end
@@ -89,6 +107,13 @@ tablePage["基础表格页"]
 userInfoPage["用户信息页"]
 userAddressPage["用户地址页"]
 end
+field --> formPage
+input --> formPage
+select --> formPage
+table --> tablePage
+pagination --> tablePage
+label --> formPage
+separator --> formPage
 btnPage --> btn
 badgePage --> badge
 avatarPage --> avatar
@@ -96,647 +121,480 @@ avatarPage --> avatarText
 alertPage --> alert
 modalPage --> modal
 videoPage --> video
-formPage --> input
-formPage --> select
+formPage --> inputOld
+formPage --> selectOld
 formPage --> btn
 formPage --> badge
 chartBarPage --> video
 chartLinePage --> video
-tablePage --> table
+tablePage --> tableOld
 userInfoPage --> userInfo
 userAddressPage --> userAddress
 ```
 
 **图表来源**
-- [src/components/ui/button/Button.tsx:1-57](file://src/components/ui/button/Button.tsx#L1-L57)
-- [src/components/ui/button.tsx:1-59](file://src/components/ui/button.tsx#L1-L59)
-- [src/components/ui/badge/Badge.tsx:1-80](file://src/components/ui/badge/Badge.tsx#L1-L80)
-- [src/components/ui/avatar/Avatar.tsx:1-66](file://src/components/ui/avatar/Avatar.tsx#L1-L66)
-- [src/components/ui/avatar/AvatarText.tsx:1-48](file://src/components/ui/avatar/AvatarText.tsx#L1-L48)
-- [src/components/ui/alert/Alert.tsx:1-146](file://src/components/ui/alert/Alert.tsx#L1-L146)
-- [src/components/ui/modal/index.tsx:1-96](file://src/components/ui/modal/index.tsx#L1-L96)
-- [src/components/ui/dropdown/Dropdown.tsx:1-49](file://src/components/ui/dropdown/Dropdown.tsx#L1-L49)
-- [src/components/ui/table/index.tsx:1-67](file://src/components/ui/table/index.tsx#L1-L67)
-- [src/components/ui/video/YoutubeEmbed.tsx:1-42](file://src/components/ui/video/YoutubeEmbed.tsx#L1-L42)
-- [src/components/ui/sonner.tsx:1-32](file://src/components/ui/sonner.tsx#L1-L32)
-- [src/components/form/input/InputField.tsx:1-87](file://src/components/form/input/InputField.tsx#L1-L87)
-- [src/components/form/Select.tsx:1-64](file://src/components/form/Select.tsx#L1-L64)
-- [src/components/user-profile/UserInfoCard.tsx:1-190](file://src/components/user-profile/UserInfoCard.tsx#L1-L190)
-- [src/components/user-profile/UserAddressCard.tsx:1-135](file://src/components/user-profile/UserAddressCard.tsx#L1-L135)
+- [src/components/ui/field.tsx:1-239](file://src/components/ui/field.tsx#L1-L239)
+- [src/components/ui/input.tsx:1-21](file://src/components/ui/input.tsx#L1-L21)
+- [src/components/ui/select.tsx:1-202](file://src/components/ui/select.tsx#L1-L202)
+- [src/components/ui/table.tsx:1-117](file://src/components/ui/table.tsx#L1-L117)
+- [src/components/ui/pagination.tsx:1-131](file://src/components/ui/pagination.tsx#L1-L131)
+- [src/components/ui/label.tsx:1-21](file://src/components/ui/label.tsx#L1-L21)
+- [src/components/ui/separator.tsx:1-26](file://src/components/ui/separator.tsx#L1-L26)
 
 ## 核心组件
-- 按钮 Button：支持尺寸、外观、图标、禁用状态等，提供轻量与完整两套实现。
-- 徽章 Badge：支持轻/实心、尺寸、颜色与前后图标。
-- 头像 Avatar：支持多尺寸与在线/忙碌/离线状态指示。
-- 头像文本 AvatarText：基于用户名生成初始字母头像，使用标准化字体大小。
-- 提示 Alert：支持成功/错误/警告/信息四类，可选"了解更多"链接。
-- 模态框 Modal：支持全屏/非全屏、关闭按钮显隐、Esc 关闭、点击遮罩关闭。
-- 下拉菜单 Dropdown：支持外部点击关闭、定位与阴影。
-- 表格 Table：提供 Table/TableHeader/TableBody/TableRow/TableCell 的组合。
-- 视频嵌入 YoutubeEmbed：支持多种宽高比与标题。
-- 通知 Toaster：基于 sonner，自动适配主题明暗模式。
-- 输入框 InputField：支持多种类型、状态反馈、提示文本。
-- 选择框 Select：支持选项列表、占位符、禁用状态。
-- 用户信息卡片：展示用户个人信息，使用标准化文本大小。
-- 用户地址卡片：展示用户地址信息，使用标准化文本大小。
+- **现代化表单系统**：Field、Input、Select 组件，基于 Base UI 提供更好的可访问性和样式变体管理
+- **增强表格系统**：全新的 Table 组件，支持容器化表格和现代化样式
+- **完整分页系统**：Pagination 组件，提供完整的分页导航功能
+- **语义化标签**：Label 组件，提供语义化的表单标签
+- **分割组件**：Separator 组件，用于内容分隔
+- **传统组件**：按钮、徽章、头像、提示、模态框、下拉菜单、通知等保持不变
 
-**更新** 所有组件都已进行样式标准化，统一使用text-sm字体大小，提升视觉一致性。
+**更新** 新增的现代化组件完全基于 Base UI 架构，提供更好的可访问性、样式变体管理和开发体验。
 
 ## 架构总览
-组件库采用"按功能域分层 + 页面示例对照"的组织方式。基础组件位于 src/components/ui，示例页面位于 src/app，形成"组件 → 使用示例 → 集成场景"的闭环。
+组件库采用"现代化组件 + 传统组件并存"的混合架构。现代化组件基于 Base UI 和 class-variance-authority，提供更好的可访问性和样式管理；传统组件保持现有实现，确保向后兼容。
 
 ```mermaid
 graph TB
-A["示例页面<br/>src/app/*"] --> B["基础组件<br/>src/components/ui/*"]
-B --> C["复合组件<br/>图表/表格/模态框"]
-B --> D["导航/交互组件<br/>下拉/头像/通知"]
-B --> E["表单组件<br/>输入框/选择框"]
-B --> F["用户信息组件<br/>卡片/资料"]
-C --> G["集成场景<br/>表单/图表/表格页"]
-D --> H["无障碍/主题适配<br/>明暗模式/键盘操作"]
-E --> G
-F --> G
-H --> I["样式标准化<br/>字体大小统一"]
+A["示例页面<br/>src/app/*"] --> B["现代化组件<br/>src/components/ui/*"]
+A --> C["传统组件<br/>src/components/ui/*"]
+B --> D["表单组件<br/>Field/Input/Select"]
+B --> E["表格组件<br/>Table/Pagination"]
+B --> F["辅助组件<br/>Label/Separator"]
+C --> G["基础组件<br/>Button/Badge/Avatar"]
+C --> H["交互组件<br/>Alert/Modal/Dropdown"]
+C --> I["复合组件<br/>图表/视频/通知"]
+D --> J["集成场景<br/>表单/数据展示"]
+E --> J
+F --> J
+G --> J
+H --> J
+I --> J
+J --> K["样式变体系统<br/>class-variance-authority"]
+J --> L["可访问性支持<br/>Base UI"]
 ```
 
 ## 详细组件分析
 
-### 按钮 Button
-- 功能概述：提供统一的按钮交互与视觉风格，支持尺寸、外观、图标、禁用状态。
-- 关键属性
-  - children：按钮内容
-  - type：button | submit | reset
-  - size：sm | md
-  - variant：primary | outline
-  - startIcon/endIcon：前后图标
-  - onClick/disabled/className
-- 交互行为
-  - 支持点击回调与禁用态
-  - 尺寸与外观通过内联样式类控制
-- 样式定制
-  - 可通过 className 扩展或覆盖默认样式
-  - 支持暗色模式下的 hover/active 状态
-  - **更新** 统一使用text-sm字体大小，提升可读性和一致性
-- 无障碍与响应式
-  - 原生 button 语义，支持键盘激活
-  - 响应式字体与间距
+### 表单字段系统 Field
 
-```mermaid
-classDiagram
-class Button {
-+children : ReactNode
-+type : "button"|"submit"|"reset"
-+size : "sm"|"md"
-+variant : "primary"|"outline"
-+startIcon : ReactNode
-+endIcon : ReactNode
-+onClick() : void
-+disabled : boolean
-+className : string
-}
-```
-
-**图表来源**
-- [src/components/ui/button/Button.tsx:3-13](file://src/components/ui/button/Button.tsx#L3-L13)
-
-**章节来源**
-- [src/components/ui/button/Button.tsx:15-57](file://src/components/ui/button/Button.tsx#L15-L57)
-
-### 徽章 Badge
-- 功能概述：用于标记状态、标签或等级，支持多种尺寸、颜色与外观。
-- 关键属性
-  - variant：light | solid
-  - size：sm | md
-  - color：primary | success | error | warning | info | light | dark
-  - startIcon/endIcon：前后图标
-  - children：徽章内容
-- 交互行为：静态展示，可配合点击事件使用
-- 样式定制：基于 variant/color/size 的组合类名
-- 无障碍与响应式：纯展示组件，注意对比度与文本可读性
-- **更新** 字体大小标准化：md尺寸使用text-sm，sm尺寸使用text-[10px]，确保视觉层次清晰
-
-```mermaid
-classDiagram
-class Badge {
-+variant : "light"|"solid"
-+size : "sm"|"md"
-+color : "primary"|"success"|"error"|"warning"|"info"|"light"|"dark"
-+startIcon : ReactNode
-+endIcon : ReactNode
-+children : ReactNode
-}
-```
-
-**图表来源**
-- [src/components/ui/badge/Badge.tsx:3-21](file://src/components/ui/badge/Badge.tsx#L3-L21)
-
-**章节来源**
-- [src/components/ui/badge/Badge.tsx:23-80](file://src/components/ui/badge/Badge.tsx#L23-L80)
-
-### 头像 Avatar
-- 功能概述：用户头像展示，支持尺寸与在线/忙碌/离线状态指示。
-- 关键属性
-  - src：头像图片地址
-  - alt：替代文本
-  - size：xsmall 到 xxlarge
-  - status：online | offline | busy | none
-- 交互行为：可结合点击打开详情或设置
-- 样式定制：尺寸与状态点大小按比例缩放
-- 无障碍与响应式：使用 next/image，具备现代图片优化能力
-
-```mermaid
-classDiagram
-class Avatar {
-+src : string
-+alt : string
-+size : "xsmall"|"small"|"medium"|"large"|"xlarge"|"xxlarge"
-+status : "online"|"offline"|"busy"|"none"
-}
-```
-
-**图表来源**
-- [src/components/ui/avatar/Avatar.tsx:4-9](file://src/components/ui/avatar/Avatar.tsx#L4-L9)
-
-**章节来源**
-- [src/components/ui/avatar/Avatar.tsx:35-66](file://src/components/ui/avatar/Avatar.tsx#L35-L66)
-
-### 头像文本 AvatarText
-- 功能概述：基于用户名生成初始字母头像，使用标准化字体大小。
-- 关键属性
-  - name：用户名
+#### Field 组件
+- **功能概述**：表单字段容器，支持垂直、水平和响应式三种布局模式
+- **关键属性**
+  - orientation：vertical | horizontal | responsive（默认 vertical）
   - className：自定义样式类
-- 交互行为：静态展示，可结合点击事件使用
-- 样式定制：基于用户名生成一致的颜色方案，使用text-sm字体大小
-- 无障碍与响应式：头像容器使用标准化尺寸，字体大小统一为text-sm
+- **交互行为**：作为语义化表单组容器，管理字段布局和状态
+- **样式定制**：基于 class-variance-authority 的变体系统，支持响应式布局
+- **无障碍与响应式**：使用 role="group" 和 data-slot 属性，支持 @container 查询
 
 ```mermaid
 classDiagram
-class AvatarText {
-+name : string
+class Field {
++orientation : "vertical"|"horizontal"|"responsive"
++className : string
+}
+class FieldSet {
++className : string
+}
+class FieldGroup {
++className : string
+}
+class FieldContent {
++className : string
+}
+Field --> FieldSet
+Field --> FieldGroup
+Field --> FieldContent
+```
+
+**图表来源**
+- [src/components/ui/field.tsx:72-86](file://src/components/ui/field.tsx#L72-L86)
+- [src/components/ui/field.tsx:10-21](file://src/components/ui/field.tsx#L10-L21)
+- [src/components/ui/field.tsx:41-52](file://src/components/ui/field.tsx#L41-L52)
+- [src/components/ui/field.tsx:88-99](file://src/components/ui/field.tsx#L88-L99)
+
+**章节来源**
+- [src/components/ui/field.tsx:72-86](file://src/components/ui/field.tsx#L72-L86)
+
+#### FieldLabel 组件
+- **功能概述**：表单字段标签，支持与输入组件的关联
+- **关键属性**：继承 Label 组件的所有属性
+- **交互行为**：与表单控件建立语义化关联
+- **样式定制**：基于 peer/field-label 选择器的动态样式
+- **无障碍与响应式**：支持禁用状态和焦点可见性
+
+**章节来源**
+- [src/components/ui/field.tsx:101-116](file://src/components/ui/field.tsx#L101-L116)
+
+#### FieldDescription 组件
+- **功能概述**：表单字段描述文本，提供额外的说明信息
+- **关键属性**：标准段落元素属性
+- **交互行为**：静态展示，支持链接样式
+- **样式定制**：基于 text-sm 和 text-muted-foreground 的样式
+- **无障碍与响应式**：支持链接样式和可访问性
+
+**章节来源**
+- [src/components/ui/field.tsx:131-144](file://src/components/ui/field.tsx#L131-L144)
+
+#### FieldError 组件
+- **功能概述**：表单字段错误信息展示，支持单个和多个错误
+- **关键属性**
+  - errors：错误对象数组
+  - children：自定义错误内容
+- **交互行为**：根据错误状态动态显示
+- **样式定制**：基于 destructiv e颜色方案
+- **无障碍与响应式**：使用 role="alert" 提供可访问性支持
+
+**章节来源**
+- [src/components/ui/field.tsx:176-225](file://src/components/ui/field.tsx#L176-L225)
+
+### 现代化输入框 Input
+
+#### Input 组件
+- **功能概述**：现代化输入框组件，基于 Base UI 实现
+- **关键属性**：继承原生 input 元素的所有属性
+- **交互行为**：原生输入行为，支持各种输入类型
+- **样式定制**：基于 data-slot="input" 的样式系统
+- **无障碍与响应式**：支持禁用状态、无效状态和焦点环
+
+```mermaid
+classDiagram
+class Input {
++type : string
 +className : string
 }
 ```
 
 **图表来源**
-- [src/components/ui/avatar/AvatarText.tsx:3-6](file://src/components/ui/avatar/AvatarText.tsx#L3-L6)
+- [src/components/ui/input.tsx:6-18](file://src/components/ui/input.tsx#L6-L18)
 
 **章节来源**
-- [src/components/ui/avatar/AvatarText.tsx:8-48](file://src/components/ui/avatar/AvatarText.tsx#L8-L48)
+- [src/components/ui/input.tsx:1-21](file://src/components/ui/input.tsx#L1-L21)
 
-### 提示 Alert
-- 功能概述：用于展示成功/错误/警告/信息类提示，可选"了解更多"链接。
-- 关键属性
-  - variant：success | error | warning | info
-  - title/message：标题与正文
-  - showLink/linkHref/linkText：链接显示与文案
-- 交互行为：可点击链接跳转
-- 样式定制：基于 variant 的容器与图标颜色类
-- 无障碍与响应式：语义化标题与段落，支持暗色模式
+### 现代化选择框 Select
+
+#### Select 组件族
+- **功能概述**：完整的现代化选择框组件系统，基于 Base UI
+- **组件结构**
+  - Select：根容器
+  - SelectTrigger：触发器
+  - SelectContent：下拉内容
+  - SelectItem：选项项
+  - SelectValue：选值显示
+  - SelectLabel：分组标签
+  - SelectSeparator：分隔线
+  - SelectScrollUpButton/SelectScrollDownButton：滚动按钮
 
 ```mermaid
 classDiagram
-class Alert {
-+variant : "success"|"error"|"warning"|"info"
-+title : string
-+message : string
-+showLink : boolean
-+linkHref : string
-+linkText : string
+class Select {
++className : string
 }
+class SelectTrigger {
++size : "sm"|"default"
++className : string
+}
+class SelectContent {
++side : string
++align : string
++className : string
+}
+class SelectItem {
++className : string
+}
+Select --> SelectTrigger
+Select --> SelectContent
+SelectContent --> SelectItem
 ```
 
 **图表来源**
-- [src/components/ui/alert/Alert.tsx:4-11](file://src/components/ui/alert/Alert.tsx#L4-L11)
+- [src/components/ui/select.tsx:9-57](file://src/components/ui/select.tsx#L9-L57)
+- [src/components/ui/select.tsx:111-137](file://src/components/ui/select.tsx#L111-L137)
 
 **章节来源**
-- [src/components/ui/alert/Alert.tsx:13-146](file://src/components/ui/alert/Alert.tsx#L13-L146)
+- [src/components/ui/select.tsx:1-202](file://src/components/ui/select.tsx#L1-L202)
 
-### 模态框 Modal
-- 功能概述：弹出式对话框，支持全屏/非全屏、关闭按钮、Esc 关闭、点击遮罩关闭。
-- 关键属性
-  - isOpen/onClose：开关与回调
-  - className：自定义样式
-  - children：模态框内容
-  - showCloseButton：是否显示关闭按钮
-  - isFullscreen：是否全屏
-- 交互行为
-  - Esc 键关闭
-  - 点击背景关闭（非全屏）
-  - 点击模态框内部不关闭
-- 样式定制：全屏与非全屏两类布局类
-- 无障碍与响应式：body 滚动锁定，z-index 管理
+### 现代化表格 Table
 
-```mermaid
-sequenceDiagram
-participant U as "用户"
-participant M as "Modal"
-U->>M : 打开 isOpen=true
-M->>M : 锁定 body 滚动
-U->>M : 按下 Esc
-M->>U : 调用 onClose()
-U->>M : 点击背景
-M->>U : 调用 onClose()
-U->>M : 点击关闭按钮
-M->>U : 调用 onClose()
-```
-
-**图表来源**
-- [src/components/ui/modal/index.tsx:23-49](file://src/components/ui/modal/index.tsx#L23-L49)
-
-**章节来源**
-- [src/components/ui/modal/index.tsx:13-96](file://src/components/ui/modal/index.tsx#L13-L96)
-
-### 下拉菜单 Dropdown
-- 功能概述：从右上角弹出的菜单容器，支持外部点击关闭。
-- 关键属性
-  - isOpen/onClose：开关与回调
-  - children：菜单项
-  - className：自定义样式
-- 交互行为：点击外部区域自动关闭
-- 样式定制：阴影、边框、圆角与明暗主题
-- 无障碍与响应式：需配合触发器的 aria-* 属性
-
-```mermaid
-flowchart TD
-Start(["打开下拉"]) --> Listen["监听鼠标事件"]
-Listen --> ClickOutside{"点击在容器外?"}
-ClickOutside --> |是| Close["调用 onClose()"]
-ClickOutside --> |否| Keep["保持打开"]
-Close --> End(["关闭"])
-Keep --> Listen
-```
-
-**图表来源**
-- [src/components/ui/dropdown/Dropdown.tsx:20-35](file://src/components/ui/dropdown/Dropdown.tsx#L20-L35)
-
-**章节来源**
-- [src/components/ui/dropdown/Dropdown.tsx:12-49](file://src/components/ui/dropdown/Dropdown.tsx#L12-L49)
-
-### 表格 Table
-- 功能概述：提供 Table、TableHeader、TableBody、TableRow、TableCell 的组合，简化表格构建。
-- 关键属性
-  - Table/TableHeader/TableBody：容器 props
-  - TableRow：行容器
-  - TableCell：单元格，支持 isHeader 切换 th/td
-- 交互行为：纯展示，可配合排序/分页等逻辑使用
-- 样式定制：默认提供基础内边距与字号，可通过 className 扩展
-- 无障碍与响应式：建议配合 caption、scope 等语义化属性
+#### Table 组件族
+- **功能概述**：现代化表格组件系统，提供容器化表格实现
+- **组件结构**
+  - Table：表格容器，支持溢出滚动
+  - TableHeader/TableBody/TableFooter：表格各部分
+  - TableRow：表格行
+  - TableHead/TableCell：表头和单元格
+  - TableCaption：表格标题
 
 ```mermaid
 classDiagram
 class Table {
-+children : ReactNode
 +className : string
 }
 class TableHeader {
-+children : ReactNode
 +className : string
 }
 class TableBody {
-+children : ReactNode
 +className : string
 }
 class TableRow {
-+children : ReactNode
++className : string
+}
+class TableHead {
 +className : string
 }
 class TableCell {
-+children : ReactNode
-+isHeader : boolean
 +className : string
 }
 Table --> TableHeader
 Table --> TableBody
 TableBody --> TableRow
 TableHeader --> TableRow
+TableRow --> TableHead
 TableRow --> TableCell
 ```
 
 **图表来源**
-- [src/components/ui/table/index.tsx:4-32](file://src/components/ui/table/index.tsx#L4-L32)
+- [src/components/ui/table.tsx:7-20](file://src/components/ui/table.tsx#L7-L20)
+- [src/components/ui/table.tsx:22-40](file://src/components/ui/table.tsx#L22-L40)
+- [src/components/ui/table.tsx:55-66](file://src/components/ui/table.tsx#L55-L66)
+- [src/components/ui/table.tsx:68-92](file://src/components/ui/table.tsx#L68-L92)
 
 **章节来源**
-- [src/components/ui/table/index.tsx:34-67](file://src/components/ui/table/index.tsx#L34-L67)
+- [src/components/ui/table.tsx:1-117](file://src/components/ui/table.tsx#L1-L117)
 
-### 视频嵌入 YoutubeEmbed
-- 功能概述：嵌入 YouTube 视频，支持多种宽高比与标题。
-- 关键属性
-  - videoId：视频 ID
-  - aspectRatio：16:9 | 4:3 | 21:9 | 1:1
-  - title：iframe 标题
-  - className：自定义样式
-- 交互行为：iframe 内部播放控制
-- 样式定制：基于 Tailwind aspect 类与圆角
-- 无障碍与响应式：提供标题，建议在父容器中控制可访问性
+### 分页 Pagination
+
+#### Pagination 组件族
+- **功能概述**：完整的分页导航组件系统
+- **组件结构**
+  - Pagination：分页容器
+  - PaginationContent：分页内容容器
+  - PaginationItem：分页项
+  - PaginationLink：分页链接
+  - PaginationPrevious/PaginationNext：前后页按钮
+  - PaginationEllipsis：省略号
 
 ```mermaid
 classDiagram
-class YoutubeEmbed {
-+videoId : string
-+aspectRatio : "16 : 9"|"4 : 3"|"21 : 9"|"1 : 1"
-+title : string
+class Pagination {
 +className : string
 }
+class PaginationContent {
++className : string
+}
+class PaginationLink {
++isActive : boolean
++size : string
++className : string
+}
+class PaginationPrevious {
++text : string
++className : string
+}
+class PaginationNext {
++text : string
++className : string
+}
+Pagination --> PaginationContent
+PaginationContent --> PaginationItem
+PaginationContent --> PaginationLink
+PaginationContent --> PaginationPrevious
+PaginationContent --> PaginationNext
 ```
 
 **图表来源**
-- [src/components/ui/video/YoutubeEmbed.tsx:5-10](file://src/components/ui/video/YoutubeEmbed.tsx#L5-L10)
+- [src/components/ui/pagination.tsx:7-17](file://src/components/ui/pagination.tsx#L7-L17)
+- [src/components/ui/pagination.tsx:19-30](file://src/components/ui/pagination.tsx#L19-L30)
+- [src/components/ui/pagination.tsx:41-63](file://src/components/ui/pagination.tsx#L41-L63)
+- [src/components/ui/pagination.tsx:65-99](file://src/components/ui/pagination.tsx#L65-L99)
 
 **章节来源**
-- [src/components/ui/video/YoutubeEmbed.tsx:12-42](file://src/components/ui/video/YoutubeEmbed.tsx#L12-L42)
+- [src/components/ui/pagination.tsx:1-131](file://src/components/ui/pagination.tsx#L1-L131)
 
-### 通知 Toaster
-- 功能概述：全局通知展示，基于 sonner，自动适配明/暗主题。
-- 关键属性
-  - 继承自 Sonner 的配置，通过 classNames 自定义 toast、描述、动作按钮等
-  - 主题由 next-themes 提供
-- 交互行为：自动消失、手动关闭、点击动作按钮
-- 样式定制：通过 toastOptions.classNames 定制
-- 无障碍与响应式：遵循浏览器通知最佳实践
+### 语义化标签 Label
 
-```mermaid
-sequenceDiagram
-participant App as "应用"
-participant Theme as "主题上下文"
-participant Toaster as "Toaster"
-App->>Theme : 读取当前主题
-Theme-->>App : 返回 theme
-App->>Toaster : 渲染通知组件
-Toaster-->>App : 应用主题样式
-```
+#### Label 组件
+- **功能概述**：语义化的表单标签组件
+- **关键属性**：继承原生 label 元素的所有属性
+- **交互行为**：与表单控件建立关联
+- **样式定制**：基于 peer 选择器的动态样式
+- **无障碍与响应式**：支持禁用状态和焦点可见性
 
-**图表来源**
-- [src/components/ui/sonner.tsx:8-29](file://src/components/ui/sonner.tsx#L8-L29)
+**章节来源**
+- [src/components/ui/label.tsx:1-21](file://src/components/ui/label.tsx#L1-L21)
+
+### 分隔线 Separator
+
+#### Separator 组件
+- **功能概述**：通用的分隔线组件
+- **关键属性**
+  - orientation：horizontal | vertical（默认 horizontal）
+  - className：自定义样式类
+- **交互行为**：静态展示，用于内容分隔
+- **样式定制**：基于 data-horizontal 和 data-vertical 的样式
+- **无障碍与响应式**：支持水平和垂直两种方向
+
+**章节来源**
+- [src/components/ui/separator.tsx:1-26](file://src/components/ui/separator.tsx#L1-L26)
+
+### 传统组件（保持不变）
+
+#### 按钮 Button
+- **功能概述**：提供统一的按钮交互与视觉风格
+- **关键属性**：与原有组件相同
+- **交互行为**：与原有组件相同
+- **样式定制**：与原有组件相同
+
+**章节来源**
+- [src/components/ui/button/Button.tsx:15-57](file://src/components/ui/button/Button.tsx#L15-L57)
+
+#### 徽章 Badge
+- **功能概述**：用于标记状态、标签或等级
+- **关键属性**：与原有组件相同
+- **交互行为**：与原有组件相同
+- **样式定制**：与原有组件相同
+
+**章节来源**
+- [src/components/ui/badge/Badge.tsx:23-80](file://src/components/ui/badge/Badge.tsx#L23-L80)
+
+#### 头像 Avatar
+- **功能概述**：用户头像展示
+- **关键属性**：与原有组件相同
+- **交互行为**：与原有组件相同
+- **样式定制**：与原有组件相同
+
+**章节来源**
+- [src/components/ui/avatar/Avatar.tsx:35-66](file://src/components/ui/avatar/Avatar.tsx#L35-L66)
+
+#### 提示 Alert
+- **功能概述**：用于展示成功/错误/警告/信息类提示
+- **关键属性**：与原有组件相同
+- **交互行为**：与原有组件相同
+- **样式定制**：与原有组件相同
+
+**章节来源**
+- [src/components/ui/alert/Alert.tsx:13-146](file://src/components/ui/alert/Alert.tsx#L13-L146)
+
+#### 模态框 Modal
+- **功能概述**：弹出式对话框
+- **关键属性**：与原有组件相同
+- **交互行为**：与原有组件相同
+- **样式定制**：与原有组件相同
+
+**章节来源**
+- [src/components/ui/modal/index.tsx:13-96](file://src/components/ui/modal/index.tsx#L13-L96)
+
+#### 下拉菜单 Dropdown
+- **功能概述**：从右上角弹出的菜单容器
+- **关键属性**：与原有组件相同
+- **交互行为**：与原有组件相同
+- **样式定制**：与原有组件相同
+
+**章节来源**
+- [src/components/ui/dropdown/Dropdown.tsx:12-49](file://src/components/ui/dropdown/Dropdown.tsx#L12-L49)
+
+#### 通知 Toaster
+- **功能概述**：全局通知展示
+- **关键属性**：与原有组件相同
+- **交互行为**：与原有组件相同
+- **样式定制**：与原有组件相同
 
 **章节来源**
 - [src/components/ui/sonner.tsx:8-32](file://src/components/ui/sonner.tsx#L8-L32)
 
-### 基础按钮（Base UI ButtonPrimitive）
-- 功能概述：基于 @base-ui/react-button 与 class-variance-authority 的变体系统，提供更丰富的尺寸与外观。
-- 关键属性
-  - variant：default | outline | secondary | ghost | destructive | link
-  - size：default | xs | sm | lg | icon | icon-xs | icon-sm | icon-lg
-  - className：扩展类名
-- 交互行为：原生按钮语义，支持焦点可见性与禁用态
-- 样式定制：通过变体与尺寸类组合，支持 slot/data-* 扩展
-- 无障碍与响应式：内置焦点环与禁用态处理
-- **更新** 字体大小标准化：所有尺寸统一使用text-sm，确保视觉一致性
-
-```mermaid
-classDiagram
-class ButtonPrimitive {
-+variant : "default"|"outline"|"secondary"|"ghost"|"destructive"|"link"
-+size : "default"|"xs"|"sm"|"lg"|"icon"|"icon-xs"|"icon-sm"|"icon-lg"
-+className : string
-}
-```
-
-**图表来源**
-- [src/components/ui/button.tsx:43-56](file://src/components/ui/button.tsx#L43-L56)
-
-**章节来源**
-- [src/components/ui/button.tsx:6-58](file://src/components/ui/button.tsx#L6-L58)
-
-### 输入框 InputField
-- 功能概述：支持多种输入类型的表单控件，提供状态反馈与提示文本。
-- 关键属性
-  - type：text | number | email | password | date | time | string
-  - id/name：表单标识
-  - placeholder/value：占位符与值
-  - onChange：值变化回调
-  - className：自定义样式
-  - disabled：禁用状态
-  - success/error：状态反馈
-  - hint：提示文本
-- 交互行为：原生输入行为，支持各种输入类型
-- 样式定制：基于状态动态生成样式类，统一使用text-sm字体大小
-- 无障碍与响应式：支持键盘操作与屏幕阅读器
-
-```mermaid
-classDiagram
-class InputField {
-+type : "text"|"number"|"email"|"password"|"date"|"time"|string
-+id : string
-+name : string
-+placeholder : string
-+value : string|number
-+onChange() : void
-+disabled : boolean
-+success : boolean
-+error : boolean
-+hint : string
-}
-```
-
-**图表来源**
-- [src/components/form/input/InputField.tsx:3-19](file://src/components/form/input/InputField.tsx#L3-L19)
-
-**章节来源**
-- [src/components/form/input/InputField.tsx:21-87](file://src/components/form/input/InputField.tsx#L21-L87)
-
-### 选择框 Select
-- 功能概述：下拉选择组件，支持选项列表与状态反馈。
-- 关键属性
-  - options：选项数组
-  - placeholder：占位符文本
-  - onChange：值变化回调
-  - className：自定义样式
-  - value/defaultValue：当前值与默认值
-  - disabled：禁用状态
-- 交互行为：下拉展开选择，支持键盘导航
-- 样式定制：基于状态动态生成样式类，统一使用text-sm字体大小
-- 无障碍与响应式：支持键盘操作与屏幕阅读器
-
-```mermaid
-classDiagram
-class Select {
-+options : Option[]
-+placeholder : string
-+onChange() : void
-+value : string
-+disabled : boolean
-}
-```
-
-**图表来源**
-- [src/components/form/Select.tsx:8-16](file://src/components/form/Select.tsx#L8-L16)
-
-**章节来源**
-- [src/components/form/Select.tsx:18-64](file://src/components/form/Select.tsx#L18-L64)
-
-### 用户信息卡片 UserInfoCard
-- 功能概述：展示用户个人信息的卡片组件，支持编辑功能。
-- 关键属性：无特定属性，通过内部状态管理
-- 交互行为：点击编辑按钮打开模态框，支持保存与取消
-- 样式定制：使用标准化的text-sm字体大小，确保信息层级清晰
-- 无障碍与响应式：响应式布局，支持移动端适配
-
-```mermaid
-classDiagram
-class UserInfoCard {
-+isOpen : boolean
-+openModal() : void
-+closeModal() : void
-+handleSave() : void
-}
-```
-
-**图表来源**
-- [src/components/user-profile/UserInfoCard.tsx:9-15](file://src/components/user-profile/UserInfoCard.tsx#L9-L15)
-
-**章节来源**
-- [src/components/user-profile/UserInfoCard.tsx:16-190](file://src/components/user-profile/UserInfoCard.tsx#L16-L190)
-
-### 用户地址卡片 UserAddressCard
-- 功能概述：展示用户地址信息的卡片组件，支持编辑功能。
-- 关键属性：无特定属性，通过内部状态管理
-- 交互行为：点击编辑按钮打开模态框，支持保存与取消
-- 样式定制：使用标准化的text-sm字体大小，确保信息层级清晰
-- 无障碍与响应式：响应式布局，支持移动端适配
-
-```mermaid
-classDiagram
-class UserAddressCard {
-+isOpen : boolean
-+openModal() : void
-+closeModal() : void
-+handleSave() : void
-}
-```
-
-**图表来源**
-- [src/components/user-profile/UserAddressCard.tsx:9-15](file://src/components/user-profile/UserAddressCard.tsx#L9-L15)
-
-**章节来源**
-- [src/components/user-profile/UserAddressCard.tsx:16-135](file://src/components/user-profile/UserAddressCard.tsx#L16-L135)
-
 ## 依赖关系分析
-- 组件间耦合度低，均以 props 输入与事件输出为主
-- 示例页面与组件库解耦，通过导入组件进行使用
-- 通知组件依赖主题上下文，实现明暗模式切换
-- 模态框与下拉菜单依赖 DOM 事件与 body 滚动控制
-- **更新** 所有表单组件统一依赖全局字体大小标准化系统
+- **现代化组件依赖**：基于 @base-ui/react-* 包，提供更好的可访问性
+- **样式管理系统**：使用 class-variance-authority 进行变体管理
+- **工具函数**：使用 cn 函数进行条件类名合并
+- **传统组件**：保持原有依赖关系，确保向后兼容
+- **新增依赖**：lucide-react 图标库，用于现代化组件的图标
 
 ```mermaid
 graph LR
-btn["Button"] --> dom["DOM 事件"]
-modal["Modal"] --> dom
-dropdown["Dropdown"] --> dom
-alert["Alert"] --> link["Next Link"]
-toast["Toaster"] --> theme["next-themes"]
-avatar["Avatar"] --> img["next/image"]
-avatarText["AvatarText"] --> initials["初始字母"]
-table["Table"] --> html["HTML 表格语义"]
-input["InputField"] --> validation["表单验证"]
-select["Select"] --> options["选项管理"]
-userInfo["UserInfoCard"] --> modal
-userAddress["UserAddressCard"] --> modal
+field["Field 系统"] --> baseUI["@base-ui/react"]
+field --> cva["class-variance-authority"]
+field --> cn["cn 工具函数"]
+input["Input"] --> baseUI
+select["Select 系统"] --> baseUI
+select --> lucide["lucide-react"]
+table["Table"] --> cn
+pagination["Pagination"] --> button["Button 组件"]
+label["Label"] --> cn
+separator["Separator"] --> baseUI
 ```
 
 **图表来源**
-- [src/components/ui/modal/index.tsx:23-49](file://src/components/ui/modal/index.tsx#L23-L49)
-- [src/components/ui/dropdown/Dropdown.tsx:20-35](file://src/components/ui/dropdown/Dropdown.tsx#L20-L35)
-- [src/components/ui/alert/Alert.tsx:13-20](file://src/components/ui/alert/Alert.tsx#L13-L20)
-- [src/components/ui/sonner.tsx:8-29](file://src/components/ui/sonner.tsx#L8-L29)
-- [src/components/ui/avatar/Avatar.tsx:44-51](file://src/components/ui/avatar/Avatar.tsx#L44-L51)
-- [src/components/ui/table/index.tsx:35-64](file://src/components/ui/table/index.tsx#L35-L64)
-- [src/components/form/input/InputField.tsx:38-50](file://src/components/form/input/InputField.tsx#L38-L50)
-- [src/components/form/Select.tsx:34-37](file://src/components/form/Select.tsx#L34-L37)
-- [src/components/user-profile/UserInfoCard.tsx:10-15](file://src/components/user-profile/UserInfoCard.tsx#L10-L15)
-- [src/components/user-profile/UserAddressCard.tsx:10-15](file://src/components/user-profile/UserAddressCard.tsx#L10-L15)
-
-**章节来源**
-- [src/components/ui/modal/index.tsx:1-96](file://src/components/ui/modal/index.tsx#L1-L96)
-- [src/components/ui/dropdown/Dropdown.tsx:1-49](file://src/components/ui/dropdown/Dropdown.tsx#L1-L49)
-- [src/components/ui/alert/Alert.tsx:1-146](file://src/components/ui/alert/Alert.tsx#L1-L146)
-- [src/components/ui/sonner.tsx:1-32](file://src/components/ui/sonner.tsx#L1-L32)
-- [src/components/ui/avatar/Avatar.tsx:1-66](file://src/components/ui/avatar/Avatar.tsx#L1-L66)
-- [src/components/ui/avatar/AvatarText.tsx:1-48](file://src/components/ui/avatar/AvatarText.tsx#L1-L48)
-- [src/components/ui/table/index.tsx:1-67](file://src/components/ui/table/index.tsx#L1-L67)
-- [src/components/form/input/InputField.tsx:1-87](file://src/components/form/input/InputField.tsx#L1-L87)
-- [src/components/form/Select.tsx:1-64](file://src/components/form/Select.tsx#L1-L64)
-- [src/components/user-profile/UserInfoCard.tsx:1-190](file://src/components/user-profile/UserInfoCard.tsx#L1-L190)
-- [src/components/user-profile/UserAddressCard.tsx:1-135](file://src/components/user-profile/UserAddressCard.tsx#L1-L135)
+- [src/components/ui/field.tsx:3-8](file://src/components/ui/field.tsx#L3-L8)
+- [src/components/ui/input.tsx:1-4](file://src/components/ui/input.tsx#L1-L4)
+- [src/components/ui/select.tsx:3-7](file://src/components/ui/select.tsx#L3-L7)
+- [src/components/ui/pagination.tsx:4](file://src/components/ui/pagination.tsx#L4)
 
 ## 性能考虑
-- 图片与媒体：Avatar 使用 next/image，建议在生产环境开启自动优化
-- 模态框与下拉菜单：仅在 isOpen/open 时渲染，减少常驻 DOM
-- 通知：避免一次性大量弹出，合理设置过期时间
-- 表格：大数据量时建议分页或虚拟滚动
-- 样式：优先使用原子化类名，减少额外 CSS
-- **更新** 字体大小标准化：统一使用text-sm，减少字体大小差异带来的渲染性能问题
+- **现代化组件优化**：基于 Base UI 的组件具有更好的性能表现
+- **样式变体管理**：class-variance-authority 提供高效的样式变体计算
+- **条件渲染**：现代化组件使用 data-slot 属性，支持更精确的条件渲染
+- **传统组件保持**：原有组件经过优化，性能稳定可靠
+- **图标优化**：lucide-react 图标库支持 Tree Shaking
+
+**更新** 新的现代化组件架构显著提升了组件的性能和开发体验。
 
 ## 故障排查指南
-- 模态框无法关闭
-  - 检查 isOpen 与 onClose 是否正确传递
-  - 确认点击事件未被子元素阻止冒泡
-  - 参考路径：[src/components/ui/modal/index.tsx:57-95](file://src/components/ui/modal/index.tsx#L57-L95)
-- 下拉菜单点击外部不关闭
-  - 确保未阻止事件冒泡或未匹配到 .dropdown-toggle
-  - 参考路径：[src/components/ui/dropdown/Dropdown.tsx:20-35](file://src/components/ui/dropdown/Dropdown.tsx#L20-L35)
-- 头像显示异常
-  - 检查 src 与 alt 是否有效
-  - 参考路径：[src/components/ui/avatar/Avatar.tsx:44-51](file://src/components/ui/avatar/Avatar.tsx#L44-L51)
-- 提示链接无效
-  - 检查 showLink、linkHref、linkText 是否正确设置
-  - 参考路径：[src/components/ui/alert/Alert.tsx:13-20](file://src/components/ui/alert/Alert.tsx#L13-L20)
-- 通知主题不生效
-  - 确认 next-themes 已正确初始化
-  - 参考路径：[src/components/ui/sonner.tsx:8-29](file://src/components/ui/sonner.tsx#L8-L29)
-- **新增** 字体大小显示异常
-  - 检查组件是否正确使用text-sm类名
-  - 确认全局字体大小变量配置正确
-  - 参考路径：[src/app/globals.css:33-36](file://src/app/globals.css#L33-L36)
+- **Field 组件布局问题**
+  - 检查 orientation 属性设置是否正确
+  - 确认子组件是否正确使用 data-slot 属性
+  - 参考路径：[src/components/ui/field.tsx:54-70](file://src/components/ui/field.tsx#L54-L70)
+- **Input 组件样式异常**
+  - 检查 data-slot="input" 样式是否被覆盖
+  - 确认禁用状态和无效状态的样式类
+  - 参考路径：[src/components/ui/input.tsx:11-14](file://src/components/ui/input.tsx#L11-L14)
+- **Select 组件下拉异常**
+  - 检查 SelectTrigger 的 size 属性
+  - 确认 Portal 渲染是否正常
+  - 参考路径：[src/components/ui/select.tsx:31-57](file://src/components/ui/select.tsx#L31-L57)
+- **Table 组件溢出问题**
+  - 检查 Table 容器的 overflow-x-auto 设置
+  - 确认表格内容是否超出容器宽度
+  - 参考路径：[src/components/ui/table.tsx:9-19](file://src/components/ui/table.tsx#L9-L19)
+- **Pagination 组件状态问题**
+  - 检查 isActive 属性是否正确传递
+  - 确认按钮变体是否根据状态切换
+  - 参考路径：[src/components/ui/pagination.tsx:36-63](file://src/components/ui/pagination.tsx#L36-L63)
+- **传统组件兼容性**
+  - 确保原有组件仍能正常工作
+  - 检查样式类名是否与新架构冲突
+  - 参考路径：[src/components/ui/button/Button.tsx:15-57](file://src/components/ui/button/Button.tsx#L15-L57)
 
 **章节来源**
-- [src/components/ui/modal/index.tsx:57-95](file://src/components/ui/modal/index.tsx#L57-L95)
-- [src/components/ui/dropdown/Dropdown.tsx:20-35](file://src/components/ui/dropdown/Dropdown.tsx#L20-L35)
-- [src/components/ui/avatar/Avatar.tsx:44-51](file://src/components/ui/avatar/Avatar.tsx#L44-L51)
-- [src/components/ui/alert/Alert.tsx:13-20](file://src/components/ui/alert/Alert.tsx#L13-L20)
-- [src/components/ui/sonner.tsx:8-29](file://src/components/ui/sonner.tsx#L8-L29)
-- [src/app/globals.css:33-36](file://src/app/globals.css#L33-L36)
+- [src/components/ui/field.tsx:54-70](file://src/components/ui/field.tsx#L54-L70)
+- [src/components/ui/input.tsx:11-14](file://src/components/ui/input.tsx#L11-L14)
+- [src/components/ui/select.tsx:31-57](file://src/components/ui/select.tsx#L31-L57)
+- [src/components/ui/table.tsx:9-19](file://src/components/ui/table.tsx#L9-L19)
+- [src/components/ui/pagination.tsx:36-63](file://src/components/ui/pagination.tsx#L36-L63)
+- [src/components/ui/button/Button.tsx:15-57](file://src/components/ui/button/Button.tsx#L15-L57)
 
 ## 结论
-本 UI 组件库以简洁、可组合为核心设计原则，覆盖基础、导航、交互与复合组件，满足管理后台常见场景。通过示例页面与组件 API 的清晰分离，开发者可以快速定位并使用所需组件，同时借助样式定制与无障碍特性，实现一致且高质量的用户体验。
+本 UI 组件库已成功引入现代化的组件架构，包括全新的 Field 表单系统、基于 Base UI 的 Input 和 Select 组件、现代化的 Table 和 Pagination 组件。新架构提供了更好的可访问性、样式管理和开发体验，同时保持了与传统组件的向后兼容性。通过示例页面与组件 API 的清晰分离，开发者可以灵活选择适合的组件进行使用。
 
-**更新** 最新版本完成了全面的样式标准化改进，特别是字体大小的统一升级，提升了整体视觉一致性和可读性。所有组件都已适配新的字体大小标准，确保在不同设备和主题下都能提供优质的用户体验。
+**更新** 最新版本实现了从传统组件架构到现代化组件架构的重大升级，为未来的组件开发奠定了坚实的基础。
 
 ## 附录
 
 ### 组件使用示例与页面对照
-- 按钮：示例页面位于 [src/app/(admin)/(ui-elements)/buttons/page.tsx](file://src/app/(admin)/(ui-elements)/buttons/page.tsx)
-- 徽章：示例页面位于 [src/app/(admin)/(ui-elements)/badge/page.tsx](file://src/app/(admin)/(ui-elements)/badge/page.tsx)
-- 头像：示例页面位于 [src/app/(admin)/(ui-elements)/avatars/page.tsx](file://src/app/(admin)/(ui-elements)/avatars/page.tsx)
-- 提示：示例页面位于 [src/app/(admin)/(ui-elements)/alerts/page.tsx](file://src/app/(admin)/(ui-elements)/alerts/page.tsx)
-- 模态框：示例页面位于 [src/app/(admin)/(ui-elements)/modals/page.tsx](file://src/app/(admin)/(ui-elements)/modals/page.tsx)
-- 视频：示例页面位于 [src/app/(admin)/(ui-elements)/videos/page.tsx](file://src/app/(admin)/(ui-elements)/videos/page.tsx)
-- 表单元素：示例页面位于 [src/app/(admin)/(others-pages)/(forms)/form-elements/page.tsx](file://src/app/(admin)/(others-pages)/(forms)/form-elements/page.tsx)
-- 图表：柱状图 [src/app/(admin)/(others-pages)/(chart)/bar-chart/page.tsx](file://src/app/(admin)/(others-pages)/(chart)/bar-chart/page.tsx)，折线图 [src/app/(admin)/(others-pages)/(chart)/line-chart/page.tsx](file://src/app/(admin)/(others-pages)/(chart)/line-chart/page.tsx)
-- 表格：基础表格 [src/app/(admin)/(others-pages)/(tables)/basic-tables/page.tsx](file://src/app/(admin)/(others-pages)/(tables)/basic-tables/page.tsx)
-- **新增** 用户信息：用户信息卡片 [src/components/user-profile/UserInfoCard.tsx](file://src/components/user-profile/UserInfoCard.tsx)
-- **新增** 用户地址：用户地址卡片 [src/components/user-profile/UserAddressCard.tsx](file://src/components/user-profile/UserAddressCard.tsx)
+- **现代化表单系统**：Field、Input、Select 组件的使用示例
+- **现代化表格系统**：Table 和 Pagination 组件的使用示例
+- **传统组件**：保持原有页面对照关系
+- **新增页面**：现代化组件的专门示例页面
 
-### 样式标准化改进详情
-- **字体大小统一**：所有组件统一使用text-sm字体大小，提升视觉一致性
-- **Select组件**：从text-xs升级到text-sm，改善可读性
-- **InputField组件**：统一使用text-sm，确保输入体验一致性
-- **Button组件**：统一使用text-sm，提升按钮内容可读性
-- **Badge组件**：md尺寸使用text-sm，sm尺寸使用text-[10px]，保持视觉层次
-- **userInfoCard组件**：统一使用text-sm，确保信息层级清晰
-- **userAddressCard组件**：统一使用text-sm，提升地址信息可读性
-- **AvatarText组件**：使用标准化的text-sm字体大小
+### 现代化组件架构详情
+- **Base UI 集成**：所有现代化组件基于 @base-ui/react-* 包
+- **class-variance-authority**：提供强大的样式变体管理
+- **data-slot 属性**：统一的组件结构标识
+- **可访问性支持**：完整的 ARIA 属性和键盘导航
+- **响应式设计**：支持移动端和桌面端的适配
 
 **章节来源**
-- [src/app/(admin)/(ui-elements)/buttons/page.tsx](file://src/app/(admin)/(ui-elements)/buttons/page.tsx)
-- [src/app/(admin)/(ui-elements)/badge/page.tsx](file://src/app/(admin)/(ui-elements)/badge/page.tsx)
-- [src/app/(admin)/(ui-elements)/avatars/page.tsx](file://src/app/(admin)/(ui-elements)/avatars/page.tsx)
-- [src/app/(admin)/(ui-elements)/alerts/page.tsx](file://src/app/(admin)/(ui-elements)/alerts/page.tsx)
-- [src/app/(admin)/(ui-elements)/modals/page.tsx](file://src/app/(admin)/(ui-elements)/modals/page.tsx)
-- [src/app/(admin)/(ui-elements)/videos/page.tsx](file://src/app/(admin)/(ui-elements)/videos/page.tsx)
-- [src/app/(admin)/(others-pages)/(forms)/form-elements/page.tsx](file://src/app/(admin)/(others-pages)/(forms)/form-elements/page.tsx)
-- [src/app/(admin)/(others-pages)/(chart)/bar-chart/page.tsx](file://src/app/(admin)/(others-pages)/(chart)/bar-chart/page.tsx)
-- [src/app/(admin)/(others-pages)/(chart)/line-chart/page.tsx](file://src/app/(admin)/(others-pages)/(chart)/line-chart/page.tsx)
-- [src/app/(admin)/(others-pages)/(tables)/basic-tables/page.tsx](file://src/app/(admin)/(others-pages)/(tables)/basic-tables/page.tsx)
-- [src/components/user-profile/UserInfoCard.tsx:1-190](file://src/components/user-profile/UserInfoCard.tsx#L1-L190)
-- [src/components/user-profile/UserAddressCard.tsx:1-135](file://src/components/user-profile/UserAddressCard.tsx#L1-L135)
-- [src/app/globals.css:33-36](file://src/app/globals.css#L33-L36)
+- [src/components/ui/field.tsx:1-239](file://src/components/ui/field.tsx#L1-L239)
+- [src/components/ui/input.tsx:1-21](file://src/components/ui/input.tsx#L1-L21)
+- [src/components/ui/select.tsx:1-202](file://src/components/ui/select.tsx#L1-L202)
+- [src/components/ui/table.tsx:1-117](file://src/components/ui/table.tsx#L1-L117)
+- [src/components/ui/pagination.tsx:1-131](file://src/components/ui/pagination.tsx#L1-L131)
