@@ -13,7 +13,20 @@ import {
   TableHead,
   TableRow,
   TableCell,
+
 } from "@/components/ui/table";
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Modal } from "@/components/ui/modal";
@@ -58,13 +71,15 @@ const Config: React.FC = () => {
 
   const [name, setName] = useState("");
   const [appId, setAppId] = useState("");
+  const [appName, setAppName] = useState("");
   const [version, setVersion] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [list, setList] = useState<TableListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [openAppAdd, setOpenAppAdd] = useState(false);
   // 删除确认弹窗状态
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletingRow, setDeletingRow] = useState<TableListItem | null>(null);
@@ -104,6 +119,24 @@ const Config: React.FC = () => {
     fetchList();
   }, [fetchList]);
 
+  const handleConfirm = async () => {
+    try {
+      setIsSubmitting(true);
+      const res = await fetch("/api/apps", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ appName, appId }),
+      });
+      const json = await res.json();
+      console.log('json,res :>> ', json, res);
+      toast.success("新建应用成功");
+      setOpenAppAdd(false)
+    } catch (error) {
+      toast.error("提交失败，请稍后重试");
+    } finally {
+      setIsSubmitting(false)
+    }
+  };
   const handleUpdate = (row: TableListItem) => {
     if (!row?.id) return;
     router.push(`/config/new?id=${row.id}&isEdit=true`);
@@ -172,10 +205,10 @@ const Config: React.FC = () => {
       <PageBreadcrumb pageTitle="配置列表" />
       <div className="space-y-6">
         <form onSubmit={handleSearch}>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
-            <FieldGroup>
+          <div className="flex items-end gap-4">
+            <FieldGroup className="flex-1">
               <FieldSet>
-                <FieldGroup className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FieldGroup className="grid grid-cols-3 gap-4">
                   <Field>
                     <FieldLabel htmlFor="name">名称</FieldLabel>
                     <Input
@@ -206,7 +239,7 @@ const Config: React.FC = () => {
                 </FieldGroup>
               </FieldSet>
             </FieldGroup>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 pb-1">
               <Button type="submit" size="sm" disabled={loading}>
                 查询
               </Button>
@@ -226,7 +259,35 @@ const Config: React.FC = () => {
         </form>
 
         <div className="flex justify-end mb-4">
-          <Button size="sm" onClick={() => router.push("/config/new")}>新建配置</Button>
+          <Button className="mr-2" size="sm" onClick={() => router.push("/config/new")}>新建配置</Button>
+          <Dialog open={openAppAdd}>
+            <form>
+              <DialogTrigger render={<Button size="sm" onClick={() => setOpenAppAdd(true)} variant="outline" />}>新增应用</DialogTrigger>
+              <DialogContent className="sm:max-w-sm">
+                <DialogHeader>
+                  <DialogTitle>新增应用</DialogTitle>
+                  <DialogDescription>
+                    创建应用信息，用于选择与关联配置。
+                  </DialogDescription>
+                </DialogHeader>
+                <FieldGroup>
+                  <Field>
+                    <Label htmlFor="appName">应用名称</Label>
+                    <Input id="appName" name="appName" defaultValue="" onChange={(e) => { setAppName(e.target.value) }} />
+                  </Field>
+                  <Field>
+                    <Label htmlFor="appId">应用 ID</Label>
+                    <Input id="appId" name="appId" defaultValue="" onChange={(e) => setAppId(e.target.value)} />
+                  </Field>
+                </FieldGroup>
+                <DialogFooter>
+                  <DialogClose render={<Button variant="outline" />}>关闭</DialogClose>
+                  <Button type="submit" disabled={isSubmitting} onClick={handleConfirm}>确定</Button>
+                </DialogFooter>
+              </DialogContent>
+            </form>
+
+          </Dialog>
         </div>
 
         {error && (

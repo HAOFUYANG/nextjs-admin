@@ -152,12 +152,13 @@ export default function AppConfigsOverview() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ids, keyword, version }),
       });
+      const filename = res.headers.get("Content-Disposition")?.match(/filename=(.*)/)![1];
       if (!res.ok) throw new Error("导出失败");
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `app-${appId}-configs.csv`;
+      a.download = filename || "app-configs.csv";
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -176,10 +177,10 @@ export default function AppConfigsOverview() {
       />
       <div className="space-y-6">
         <form onSubmit={handleSearch}>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-4">
-            <FieldGroup>
+          <div className="flex items-end gap-3">
+            <FieldGroup className="flex-1">
               <FieldSet>
-                <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FieldGroup className="grid grid-cols-3 gap-3">
                   <Field>
                     <FieldLabel htmlFor="keyword">名称</FieldLabel>
                     <Input
@@ -201,7 +202,7 @@ export default function AppConfigsOverview() {
                 </FieldGroup>
               </FieldSet>
             </FieldGroup>
-            <div className="mt-6 flex items-center gap-3">
+            <div className="flex items-center gap-3">
               <Button type="submit" size="sm" disabled={loading}>
                 {loading ? "查询中..." : "查询"}
               </Button>
