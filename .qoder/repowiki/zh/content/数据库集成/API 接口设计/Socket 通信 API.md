@@ -2,14 +2,27 @@
 
 <cite>
 **本文档引用的文件**
-- [src/app/(admin)/(others-pages)/(scene)/socket/page.tsx](file://src/app/(admin)/(others-pages)/(scene)/socket/page.tsx)
+- [apps/web/src/context/SocketContext.tsx](file://apps/web/src/context/SocketContext.tsx)
+- [apps/web/src/hooks/use-chat-feed.ts](file://apps/web/src/hooks/use-chat-feed.ts)
+- [apps/web/src/hooks/use-group-chat.ts](file://apps/web/src/hooks/use-group-chat.ts)
+- [apps/service/src/realtime/base-realtime.gateway.ts](file://apps/service/src/realtime/base-realtime.gateway.ts)
+- [apps/service/src/realtime/realtime.gateway.ts](file://apps/service/src/realtime/realtime.gateway.ts)
+- [apps/service/src/realtime/realtime.service.ts](file://apps/service/src/realtime/realtime.service.ts)
+- [apps/service/src/realtime/user.store.ts](file://apps/service/src/realtime/user.store.ts)
+- [apps/web/src/components/chat/ChatBubble.tsx](file://apps/web/src/components/chat/ChatBubble.tsx)
+- [apps/web/src/components/chat/ChatInput.tsx](file://apps/web/src/components/chat/ChatInput.tsx)
+- [apps/web/src/components/chat/LoginDialog.tsx](file://apps/web/src/components/chat/LoginDialog.tsx)
+- [apps/web/src/app/(admin)/(others-pages)/(scene)/socket/page.tsx](file://apps/web/src/app/(admin)/(others-pages)/(scene)/socket/page.tsx)
 - [package.json](file://package.json)
-- [src/components/header/NotificationDropdown.tsx](file://src/components/header/NotificationDropdown.tsx)
-- [src/components/ui/avatar/Avatar.tsx](file://src/components/ui/avatar/Avatar.tsx)
-- [src/components/ecommerce/StatisticsChart.tsx](file://src/components/ecommerce/StatisticsChart.tsx)
-- [src/components/charts/line/LineChartOne.tsx](file://src/components/charts/line/LineChartOne.tsx)
-- [src/components/charts/bar/BarChartOne.tsx](file://src/components/charts/bar/BarChartOne.tsx)
 </cite>
+
+## 更新摘要
+**所做更改**
+- 新增完整的 SocketContext 实现，提供全局 Socket 连接管理
+- 新增聊天钩子系统，包括 use-chat-feed 和 use-group-chat
+- 新增服务端实时通信网关和消息处理逻辑
+- 新增聊天组件生态系统，包括消息气泡、输入框和登录对话框
+- 更新实时通信架构，从简单测试页面升级为完整的聊天系统
 
 ## 目录
 1. [简介](#简介)
@@ -24,185 +37,225 @@
 10. [附录](#附录)
 
 ## 简介
-本文件面向需要在 Next.js 应用中实现实时功能的开发者，系统性梳理与 Socket 通信 API 相关的前端实现思路与最佳实践。当前仓库中存在一个占位页面用于承载 Socket 功能入口，并配套了通知栏、在线状态指示器以及多种图表组件，这些均可作为实时数据展示与交互的基础。
+本文件面向需要在 Next.js 应用中实现实时功能的开发者，系统性梳理与 Socket 通信 API 相关的完整实现方案。当前仓库已从简单的 Socket 测试页面升级为完整的实时通信系统，包含 SocketContext 全局状态管理、聊天钩子、服务端网关和完整的聊天组件生态。
 
-需要注意的是：本仓库未包含实际的 WebSocket 客户端或服务端实现代码。本文档将以现有文件为基础，给出可扩展到真实 Socket 通信的架构设计、消息格式、事件处理、心跳与重连策略、状态管理与性能优化建议，帮助你在不改变现有结构的前提下接入真实的实时通信能力。
+该系统基于 Socket.IO 实现，提供用户认证、房间管理、群聊消息、在线状态管理和天气数据推送等完整功能。文档将详细说明连接建立、消息格式、事件处理机制、心跳检测、断线重连策略以及完整的用户体验流程。
 
 ## 项目结构
-与 Socket 通信 API 相关的前端结构要点如下：
-- 页面入口：位于场景页下的 Socket 页面，作为实时功能的挂载点
-- 通知与状态：通知下拉组件用于系统通知推送；头像组件支持在线状态指示
-- 图表组件：折线图、柱状图等可视化组件可用于实时数据的动态更新
+完整的实时通信系统由前端 SocketContext、聊天钩子、聊天组件和后端服务端网关组成：
 
 ```mermaid
 graph TB
-subgraph "页面层"
-SockPage["Socket 页面<br/>src/app/(admin)/(others-pages)/(scene)/socket/page.tsx"]
+subgraph "前端架构"
+SocketCtx["SocketContext<br/>全局连接管理"]
+ChatHooks["聊天钩子<br/>use-chat-feed & use-group-chat"]
+ChatComponents["聊天组件<br/>ChatBubble, ChatInput, LoginDialog"]
+Frontend["Next.js 应用<br/>页面层"]
 end
-subgraph "UI 组件层"
-Noti["通知下拉组件<br/>src/components/header/NotificationDropdown.tsx"]
-Avatar["头像与在线状态<br/>src/components/ui/avatar/Avatar.tsx"]
+subgraph "后端架构"
+BaseGateway["BaseRealtimeGateway<br/>抽象基类"]
+RealtimeGateway["RealtimeGateway<br/>聊天网关"]
+RealtimeService["RealtimeService<br/>消息构建器"]
+UserStore["UserStore<br/>用户存储"]
+WeatherService["WeatherService<br/>天气服务"]
 end
-subgraph "可视化层"
-LineChart["折线图组件<br/>src/components/charts/line/LineChartOne.tsx"]
-BarChart["柱状图组件<br/>src/components/charts/bar/BarChartOne.tsx"]
-StatChart["统计图表组件<br/>src/components/ecommerce/StatisticsChart.tsx"]
+subgraph "通信层"
+SocketIO["Socket.IO 服务器"]
+CORS["CORS 配置<br/>多端口支持"]
 end
-SockPage --> Noti
-SockPage --> Avatar
-SockPage --> LineChart
-SockPage --> BarChart
-SockPage --> StatChart
+Frontend --> SocketCtx
+SocketCtx --> ChatHooks
+ChatHooks --> ChatComponents
+Frontend --> RealtimeGateway
+RealtimeGateway --> SocketIO
+SocketIO --> RealtimeService
+SocketIO --> UserStore
+SocketIO --> WeatherService
+SocketIO --> CORS
 ```
 
 **图表来源**
-- [src/app/(admin)/(others-pages)/(scene)/socket/page.tsx](file://src/app/(admin)/(others-pages)/(scene)/socket/page.tsx#L1-L13)
-- [src/components/header/NotificationDropdown.tsx:1-392](file://src/components/header/NotificationDropdown.tsx#L1-L392)
-- [src/components/ui/avatar/Avatar.tsx:1-65](file://src/components/ui/avatar/Avatar.tsx#L1-L65)
-- [src/components/charts/line/LineChartOne.tsx:1-134](file://src/components/charts/line/LineChartOne.tsx#L1-L134)
-- [src/components/charts/bar/BarChartOne.tsx:1-111](file://src/components/charts/bar/BarChartOne.tsx#L1-L111)
-- [src/components/ecommerce/StatisticsChart.tsx:1-180](file://src/components/ecommerce/StatisticsChart.tsx#L1-L180)
-
-**章节来源**
-- [src/app/(admin)/(others-pages)/(scene)/socket/page.tsx](file://src/app/(admin)/(others-pages)/(scene)/socket/page.tsx#L1-L13)
+- [apps/web/src/context/SocketContext.tsx:1-72](file://apps/web/src/context/SocketContext.tsx#L1-L72)
+- [apps/web/src/hooks/use-chat-feed.ts:1-91](file://apps/web/src/hooks/use-chat-feed.ts#L1-L91)
+- [apps/web/src/hooks/use-group-chat.ts:1-173](file://apps/web/src/hooks/use-group-chat.ts#L1-L173)
+- [apps/service/src/realtime/realtime.gateway.ts:1-179](file://apps/service/src/realtime/realtime.gateway.ts#L1-L179)
 
 ## 核心组件
-- Socket 页面（占位）：作为实时功能的挂载容器，负责初始化与调度相关逻辑
-- 通知下拉组件：用于接收系统通知类消息，可映射为 Socket 推送的系统公告
-- 头像组件：支持在线/离线/忙碌状态，可映射为用户在线状态变更
-- 图表组件：提供动态数据更新接口，可映射为 Socket 推送的实时指标数据
+
+### SocketContext - 全局连接管理
+提供统一的 Socket 连接状态管理，支持连接状态监听、客户端 ID 获取和自动断线重连。
 
 **章节来源**
-- [src/app/(admin)/(others-pages)/(scene)/socket/page.tsx](file://src/app/(admin)/(others-pages)/(scene)/socket/page.tsx#L1-L13)
-- [src/components/header/NotificationDropdown.tsx:1-392](file://src/components/header/NotificationDropdown.tsx#L1-L392)
-- [src/components/ui/avatar/Avatar.tsx:1-65](file://src/components/ui/avatar/Avatar.tsx#L1-L65)
-- [src/components/ecommerce/StatisticsChart.tsx:1-180](file://src/components/ecommerce/StatisticsChart.tsx#L1-L180)
-- [src/components/charts/line/LineChartOne.tsx:1-134](file://src/components/charts/line/LineChartOne.tsx#L1-L134)
-- [src/components/charts/bar/BarChartOne.tsx:1-111](file://src/components/charts/bar/BarChartOne.tsx#L1-L111)
+- [apps/web/src/context/SocketContext.tsx:1-72](file://apps/web/src/context/SocketContext.tsx#L1-L72)
+
+### 聊天钩子系统
+- **use-chat-feed**: 提供基础聊天功能，支持房间加入、心跳检测和消息广播
+- **use-group-chat**: 提供完整的群聊功能，包括用户认证、房间管理、消息处理和在线状态
+
+**章节来源**
+- [apps/web/src/hooks/use-chat-feed.ts:1-91](file://apps/web/src/hooks/use-chat-feed.ts#L1-L91)
+- [apps/web/src/hooks/use-group-chat.ts:1-173](file://apps/web/src/hooks/use-group-chat.ts#L1-L173)
+
+### 聊天组件生态
+- **ChatBubble**: 消息气泡组件，支持用户头像、消息样式和时间显示
+- **ChatInput**: 聊天输入组件，支持自动高度调整、快捷键和在线人数显示
+- **LoginDialog**: 登录对话框，支持昵称设置和头像选择
+
+**章节来源**
+- [apps/web/src/components/chat/ChatBubble.tsx:1-110](file://apps/web/src/components/chat/ChatBubble.tsx#L1-L110)
+- [apps/web/src/components/chat/ChatInput.tsx:1-62](file://apps/web/src/components/chat/ChatInput.tsx#L1-L62)
+- [apps/web/src/components/chat/LoginDialog.tsx:1-105](file://apps/web/src/components/chat/LoginDialog.tsx#L1-L105)
+
+### 服务端网关架构
+- **BaseRealtimeGateway**: 抽象基类，提供网关初始化和客户端计数功能
+- **RealtimeGateway**: 主要聊天网关，处理用户认证、房间管理和消息转发
+- **RealtimeService**: 消息构建器，统一构建标准化的实时消息格式
+- **UserStore**: 用户存储，管理在线用户状态和房间分配
+
+**章节来源**
+- [apps/service/src/realtime/base-realtime.gateway.ts:1-16](file://apps/service/src/realtime/base-realtime.gateway.ts#L1-L16)
+- [apps/service/src/realtime/realtime.gateway.ts:1-179](file://apps/service/src/realtime/realtime.gateway.ts#L1-L179)
+- [apps/service/src/realtime/realtime.service.ts:1-87](file://apps/service/src/realtime/realtime.service.ts#L1-L87)
+- [apps/service/src/realtime/user.store.ts:1-59](file://apps/service/src/realtime/user.store.ts#L1-L59)
 
 ## 架构总览
-以下为基于现有组件的实时通信架构示意。该图为概念性架构，展示页面、通知、状态与图表如何协同工作以呈现实时数据与系统通知。
+完整的实时通信架构展示了从前端到后端的完整数据流：
 
 ```mermaid
-graph TB
-Client["浏览器客户端<br/>Next.js 应用"]
-WS["WebSocket 服务器"]
-API["后端 API 服务"]
-subgraph "前端子系统"
-Page["Socket 页面"]
-Notify["通知下拉组件"]
-Status["头像在线状态"]
-Charts["图表组件集合"]
-end
-Client --> Page
-Page --> Notify
-Page --> Status
-Page --> Charts
-Page --> WS
-WS --> API
-API --> WS
-WS --> Page
+sequenceDiagram
+participant Client as "客户端应用"
+participant SocketCtx as "SocketContext"
+participant ChatHook as "聊天钩子"
+participant Gateway as "RealtimeGateway"
+participant Service as "RealtimeService"
+participant Store as "UserStore"
+Client->>SocketCtx : 初始化连接
+SocketCtx->>Gateway : 建立 WebSocket 连接
+Gateway->>Service : 处理认证请求
+Service->>Store : 验证用户信息
+Store-->>Service : 返回用户数据
+Service-->>Gateway : 构建认证响应
+Gateway-->>SocketCtx : 发送认证结果
+SocketCtx-->>ChatHook : 更新连接状态
+ChatHook->>Gateway : 发送聊天消息
+Gateway->>Service : 构建消息格式
+Service-->>Gateway : 标准化消息
+Gateway-->>所有客户端 : 广播聊天消息
 ```
 
-[此图为概念性架构，无需图表来源]
+**图表来源**
+- [apps/web/src/context/SocketContext.tsx:20-63](file://apps/web/src/context/SocketContext.tsx#L20-L63)
+- [apps/web/src/hooks/use-group-chat.ts:137-155](file://apps/web/src/hooks/use-group-chat.ts#L137-L155)
+- [apps/service/src/realtime/realtime.gateway.ts:63-80](file://apps/service/src/realtime/realtime.gateway.ts#L63-L80)
 
 ## 详细组件分析
 
-### Socket 页面（实时入口）
-- 职责：作为实时功能的挂载点，负责初始化 WebSocket 连接、注册事件处理器、触发数据更新与状态同步
-- 建议：在此页面内维护连接状态机（未连接/已连接/重连中），并在卸载时清理资源
+### SocketContext - 连接生命周期管理
+SocketContext 提供了完整的连接生命周期管理，包括连接建立、状态监听和资源清理。
+
+**核心功能**:
+- 自动连接管理：使用 Socket.IO 客户端自动建立连接
+- 状态同步：实时同步连接状态和客户端 ID
+- 事件监听：监听连接和断开事件
+- 资源清理：组件卸载时自动断开连接
 
 **章节来源**
-- [src/app/(admin)/(others-pages)/(scene)/socket/page.tsx](file://src/app/(admin)/(others-pages)/(scene)/socket/page.tsx#L1-L13)
+- [apps/web/src/context/SocketContext.tsx:20-63](file://apps/web/src/context/SocketContext.tsx#L20-L63)
 
-### 通知下拉组件（系统通知）
-- 职责：渲染系统通知列表，支持标记已读、展开/收起
-- 与实时通信的映射：可将 WebSocket 推送的系统公告映射为通知项，动态插入列表并控制“未读”徽标
+### use-chat-feed - 基础聊天功能
+提供简单的聊天功能，适合测试和基础演示用途。
 
-```mermaid
-sequenceDiagram
-participant C as "客户端"
-participant P as "Socket 页面"
-participant N as "通知下拉组件"
-C->>P : "收到系统通知消息"
-P->>N : "更新通知列表"
-N-->>C : "显示新通知并提示未读"
+**主要功能**:
+- 房间管理：支持动态切换聊天房间
+- 心跳检测：定期发送 ping 请求验证连接
+- 消息广播：向指定房间广播消息
+- 日志记录：记录所有聊天活动
+
+**章节来源**
+- [apps/web/src/hooks/use-chat-feed.ts:11-91](file://apps/web/src/hooks/use-chat-feed.ts#L11-L91)
+
+### use-group-chat - 完整群聊系统
+提供企业级的群聊功能，包含用户认证、房间管理和消息处理。
+
+**核心功能**:
+- 用户认证：支持昵称和头像设置
+- 房间管理：动态加入/离开聊天室
+- 消息处理：实时接收和发送聊天消息
+- 在线状态：跟踪房间内用户状态
+- 自动滚动：消息自动滚动到底部
+
+**章节来源**
+- [apps/web/src/hooks/use-group-chat.ts:31-173](file://apps/web/src/hooks/use-group-chat.ts#L31-L173)
+
+### RealtimeGateway - 服务端消息处理
+服务端的主要聊天网关，处理所有客户端消息和业务逻辑。
+
+**消息处理流程**:
+- **认证流程**: 验证用户登录状态
+- **房间管理**: 处理用户加入/离开房间
+- **消息转发**: 向房间内所有用户广播消息
+- **心跳响应**: 处理客户端 ping 请求
+- **天气推送**: 定时推送天气数据
+
+**章节来源**
+- [apps/service/src/realtime/realtime.gateway.ts:49-179](file://apps/service/src/realtime/realtime.gateway.ts#L49-L179)
+
+### RealtimeService - 消息标准化
+提供统一的消息格式构建器，确保所有实时消息遵循一致的结构。
+
+**消息格式规范**:
+```typescript
+type RealtimeEvent<T> = {
+  type: string;      // 事件类型
+  time: number;      // 时间戳
+  requestId: string; // 请求ID
+  data: T;           // 消息数据
+};
 ```
 
-**图表来源**
-- [src/components/header/NotificationDropdown.tsx:1-392](file://src/components/header/NotificationDropdown.tsx#L1-L392)
+**支持的消息类型**:
+- 用户认证信息
+- 房间用户列表
+- 聊天消息
+- 天气数据
+- 系统错误
 
 **章节来源**
-- [src/components/header/NotificationDropdown.tsx:1-392](file://src/components/header/NotificationDropdown.tsx#L1-L392)
+- [apps/service/src/realtime/realtime.service.ts:6-87](file://apps/service/src/realtime/realtime.service.ts#L6-L87)
 
-### 头像与在线状态（用户在线状态）
-- 职责：根据传入的状态值渲染在线/离线/忙碌等状态指示
-- 与实时通信的映射：WebSocket 推送用户在线状态变更时，更新对应用户的头像状态
+### 聊天组件 - 用户界面层
+提供完整的聊天用户界面，包括消息显示、输入和用户交互。
 
-```mermaid
-sequenceDiagram
-participant C as "客户端"
-participant P as "Socket 页面"
-participant A as "头像组件"
-C->>P : "收到用户在线状态变更"
-P->>A : "更新用户头像状态"
-A-->>C : "界面显示新的在线状态"
-```
-
-**图表来源**
-- [src/components/ui/avatar/Avatar.tsx:1-65](file://src/components/ui/avatar/Avatar.tsx#L1-L65)
+**组件协作**:
+- **ChatBubble**: 渲染单条消息，区分用户消息和系统消息
+- **ChatInput**: 处理用户输入，支持多行文本和快捷键
+- **LoginDialog**: 处理用户登录，收集昵称和头像信息
 
 **章节来源**
-- [src/components/ui/avatar/Avatar.tsx:1-65](file://src/components/ui/avatar/Avatar.tsx#L1-L65)
-
-### 图表组件（实时数据更新）
-- 职责：提供动态数据更新接口，支持折线图、柱状图等可视化
-- 与实时通信的映射：WebSocket 推送指标数据时，调用图表组件的更新方法刷新视图
-
-```mermaid
-sequenceDiagram
-participant C as "客户端"
-participant P as "Socket 页面"
-participant L as "折线图组件"
-participant B as "柱状图组件"
-participant S as "统计图表组件"
-C->>P : "收到实时指标数据"
-P->>L : "更新 series 数据"
-P->>B : "更新 series 数据"
-P->>S : "更新 series 数据"
-L-->>C : "重新渲染折线图"
-B-->>C : "重新渲染柱状图"
-S-->>C : "重新渲染统计图"
-```
-
-**图表来源**
-- [src/components/charts/line/LineChartOne.tsx:1-134](file://src/components/charts/line/LineChartOne.tsx#L1-L134)
-- [src/components/charts/bar/BarChartOne.tsx:1-111](file://src/components/charts/bar/BarChartOne.tsx#L1-L111)
-- [src/components/ecommerce/StatisticsChart.tsx:1-180](file://src/components/ecommerce/StatisticsChart.tsx#L1-L180)
-
-**章节来源**
-- [src/components/charts/line/LineChartOne.tsx:1-134](file://src/components/charts/line/LineChartOne.tsx#L1-L134)
-- [src/components/charts/bar/BarChartOne.tsx:1-111](file://src/components/charts/bar/BarChartOne.tsx#L1-L111)
-- [src/components/ecommerce/StatisticsChart.tsx:1-180](file://src/components/ecommerce/StatisticsChart.tsx#L1-L180)
+- [apps/web/src/components/chat/ChatBubble.tsx:94-110](file://apps/web/src/components/chat/ChatBubble.tsx#L94-L110)
+- [apps/web/src/components/chat/ChatInput.tsx:14-62](file://apps/web/src/components/chat/ChatInput.tsx#L14-L62)
+- [apps/web/src/components/chat/LoginDialog.tsx:24-105](file://apps/web/src/components/chat/LoginDialog.tsx#L24-L105)
 
 ## 依赖分析
-- 项目依赖：Next.js、React、apexcharts、react-apexcharts 等
-- Socket 通信 API 的实现建议：
-  - 客户端：使用标准 WebSocket 或封装库（如 Socket.IO 客户端），在页面中集中管理连接生命周期
-  - 服务端：提供 REST API 与 WebSocket 服务，统一认证与鉴权
-  - 可视化：复用现有图表组件，通过数据更新接口实现动态刷新
+实时通信系统的核心依赖关系：
 
 ```mermaid
 graph LR
-Pkg["package.json 依赖声明"]
-Next["Next.js 框架"]
-React["React 运行时"]
-Apex["apexcharts"]
-RAC["react-apexcharts"]
-Pkg --> Next
-Pkg --> React
-Pkg --> Apex
-Pkg --> RAC
+subgraph "前端依赖"
+SocketIO["socket.io-client<br/>Socket.IO 客户端"]
+React["react<br/>React 运行时"]
+Typescript["typescript<br/>TypeScript 类型定义"]
+CSSModules["*.css<br/>样式模块"]
+End
+subgraph "后端依赖"
+NestJS["@nestjs/websockets<br/>WebSocket 框架"]
+SocketIOServer["socket.io<br/>Socket.IO 服务器"]
+NestSchedule["@nestjs/schedule<br/>定时任务"]
+WeatherAPI["天气 API<br/>天气数据服务"]
+End
+SocketIO --> NestJS
+NestJS --> SocketIOServer
+SocketIOServer --> WeatherAPI
 ```
 
 **图表来源**
@@ -212,66 +265,112 @@ Pkg --> RAC
 - [package.json:1-79](file://package.json#L1-L79)
 
 ## 性能考虑
-- 连接池与复用：避免频繁创建/销毁连接，尽量复用单个长连接
-- 批量更新：对高频指标数据采用批量合并策略，减少图表重绘次数
-- 防抖与节流：对用户交互与数据到达进行防抖/节流，降低 UI 压力
-- 懒加载与按需渲染：仅在可见区域渲染图表，使用虚拟滚动优化大数据集
-- 内存管理：在组件卸载时清理定时器、事件监听器与缓存
+实时通信系统的性能优化策略：
 
-[本节为通用性能建议，无需章节来源]
+### 前端优化
+- **连接池管理**: SocketContext 统一管理连接，避免重复创建
+- **消息节流**: 使用 useCallback 优化消息处理函数
+- **虚拟滚动**: 限制消息列表长度，只保留最近 200 条消息
+- **懒加载**: 头像图片按需加载，减少初始资源消耗
+
+### 后端优化
+- **内存管理**: UserStore 使用 Map 结构，高效管理用户状态
+- **广播优化**: 使用房间广播，避免全量推送
+- **定时任务**: 天气数据每 10 秒推送一次，避免频繁请求
+- **错误处理**: 完善的错误捕获和日志记录
+
+### 网络优化
+- **传输协议**: 使用 WebSocket 传输，降低协议开销
+- **CORS 配置**: 支持多个开发端口，提高开发效率
+- **连接复用**: 单个 Socket 连接处理多种消息类型
 
 ## 故障排除指南
-- 连接失败
-  - 检查网络与代理配置，确认 WebSocket 地址可达
-  - 在页面中记录连接状态与错误码，便于定位问题
-- 心跳异常
-  - 确认心跳间隔设置合理，避免过于频繁导致带宽压力
-  - 在客户端实现超时检测与自动重连
-- 数据不同步
-  - 对关键指标引入版本号或时间戳，确保后进先出的数据不会覆盖最新值
-- UI 卡顿
-  - 将数据更新与 UI 渲染分离，使用 requestAnimationFrame 或微任务队列
-  - 对图表更新进行节流，避免每条消息都触发重绘
 
-[本节为通用故障排除建议，无需章节来源]
+### 连接问题
+- **连接失败**: 检查 NEXT_PUBLIC_SOCKET_URL 环境变量配置
+- **跨域错误**: 确认 CORS 配置中的允许域名
+- **认证失败**: 验证用户登录流程和用户存储状态
+
+### 消息问题
+- **消息丢失**: 检查房间名称和用户认证状态
+- **消息重复**: 确认消息 ID 生成和去重逻辑
+- **消息延迟**: 监控网络延迟和服务端处理时间
+
+### 性能问题
+- **内存泄漏**: 检查事件监听器的正确清理
+- **UI 卡顿**: 优化消息渲染和组件更新
+- **连接中断**: 实现自动重连和状态恢复
+
+### 开发调试
+- **日志监控**: 利用 NestJS 日志系统查看连接状态
+- **网络调试**: 使用浏览器开发者工具监控 WebSocket 通信
+- **消息追踪**: 添加消息 ID 和时间戳便于问题定位
 
 ## 结论
-本仓库提供了良好的实时功能入口与配套 UI 组件，可作为接入 WebSocket 通信 API 的基础。建议在 Socket 页面中集中实现连接管理、事件分发与状态同步，并通过通知、在线状态与图表组件完成完整的实时体验闭环。结合本文档的架构设计与最佳实践，可在不破坏现有结构的前提下快速集成真实的服务端实时能力。
+本仓库已从简单的 Socket 测试页面升级为完整的实时通信系统，提供了从连接管理到用户界面的全套解决方案。新的架构具有以下优势：
 
-[本节为总结性内容，无需章节来源]
+- **模块化设计**: SocketContext、聊天钩子和组件分离，职责清晰
+- **可扩展性**: 基于 Socket.IO 的插件化架构，易于添加新功能
+- **用户体验**: 完整的聊天功能，包括认证、房间管理和消息处理
+- **性能优化**: 前后端双重优化，支持高并发场景
+
+建议开发者基于此架构继续扩展更多实时功能，如文件传输、视频通话、实时协作编辑等高级特性。
 
 ## 附录
 
-### 连接协议与消息格式建议
-- 协议选择
-  - WebSocket：轻量、低延迟，适合高频率数据推送
-  - Socket.IO：内置广播、房间、重连等高级特性，适合复杂业务
-- 认证与握手
-  - 连接建立时携带认证信息（如令牌），服务端校验通过后返回会话标识
-- 消息格式
-  - JSON 结构：包含类型、主题、负载与时间戳
-  - 示例字段：type（事件类型）、topic（频道/房间）、payload（数据体）、ts（时间戳）
+### 消息协议规范
+实时通信采用标准化的消息格式：
 
-[本节为规范建议，无需章节来源]
+**通用消息结构**:
+```typescript
+{
+  type: string;      // 事件类型
+  time: number;      // 事件时间戳
+  requestId: string; // 唯一请求ID
+  data: any;         // 业务数据
+}
+```
 
-### 心跳检测与断线重连策略
-- 心跳
-  - 客户端与服务端约定固定间隔的心跳包（如 25 秒）
-  - 超过阈值未收到心跳则判定连接异常
-- 重连
-  - 指数退避策略（1s、2s、4s…上限 60s）
-  - 最大重试次数限制与失败回调
-  - 重连成功后请求增量同步或全量同步
+**客户端消息类型**:
+- `client:login`: 用户登录请求
+- `client:join`: 加入房间请求  
+- `client:message`: 聊天消息
+- `client:ping`: 心跳检测
 
-[本节为策略建议，无需章节来源]
+**服务端消息类型**:
+- `server:user-info`: 用户信息响应
+- `server:user-joined`: 用户加入通知
+- `server:user-left`: 用户离开通知
+- `server:message`: 聊天消息
+- `server:pong`: 心跳响应
+- `server:weather`: 天气数据
 
-### 连接状态管理与错误恢复
-- 状态机
-  - 未连接 → 已连接 → 重连中 → 已断开
-  - 每个状态绑定对应的 UI 提示与行为
-- 错误恢复
-  - 记录错误日志与上下文信息
-  - 对可恢复错误（网络抖动）自动重试
-  - 对不可恢复错误（认证失败）引导用户重新登录
+### 连接状态管理
+完整的连接状态机：
 
-[本节为流程建议，无需章节来源]
+```mermaid
+stateDiagram-v2
+[*] --> 未连接
+未连接 --> 连接中 : 建立连接
+连接中 --> 已连接 : 连接成功
+连接中 --> 连接失败 : 连接失败
+已连接 --> 断开中 : 主动断开
+已连接 --> 重连中 : 连接断开
+重连中 --> 已连接 : 重连成功
+重连中 --> 连接失败 : 重连失败
+连接失败 --> 重连中 : 自动重连
+断开中 --> [*]
+```
+
+### 错误处理策略
+- **认证错误**: 返回 server:error 类型消息
+- **业务错误**: 包含 scope 和 message 字段
+- **网络错误**: 自动重连和状态恢复
+- **数据错误**: 完善的输入验证和错误提示
+
+### 最佳实践建议
+- **连接管理**: 使用 SocketContext 统一管理连接生命周期
+- **状态同步**: 保持前端状态与服务端状态一致
+- **错误处理**: 完善的错误捕获和用户提示
+- **性能监控**: 监控连接状态、消息延迟和内存使用
+- **安全考虑**: 实施适当的访问控制和数据验证

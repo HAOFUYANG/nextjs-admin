@@ -2,48 +2,51 @@
 
 <cite>
 **本文引用的文件**
-- [src/components/ui/button/Button.tsx](file://src/components/ui/button/Button.tsx)
-- [src/components/ui/badge/Badge.tsx](file://src/components/ui/badge/Badge.tsx)
-- [src/components/ui/avatar/Avatar.tsx](file://src/components/ui/avatar/Avatar.tsx)
-- [src/components/ui/avatar/AvatarText.tsx](file://src/components/ui/avatar/AvatarText.tsx)
-- [src/components/ui/alert/Alert.tsx](file://src/components/ui/alert/Alert.tsx)
-- [src/components/ui/modal/index.tsx](file://src/components/ui/modal/index.tsx)
-- [src/components/ui/dropdown/Dropdown.tsx](file://src/components/ui/dropdown/Dropdown.tsx)
-- [src/components/ui/table/index.tsx](file://src/components/ui/table/index.tsx)
-- [src/components/ui/video/YoutubeEmbed.tsx](file://src/components/ui/video/YoutubeEmbed.tsx)
-- [src/components/ui/sonner.tsx](file://src/components/ui/sonner.tsx)
-- [src/components/ui/button.tsx](file://src/components/ui/button.tsx)
-- [src/components/form/input/InputField.tsx](file://src/components/form/input/InputField.tsx)
-- [src/components/form/Select.tsx](file://src/components/form/Select.tsx)
-- [src/components/user-profile/UserInfoCard.tsx](file://src/components/user-profile/UserInfoCard.tsx)
-- [src/components/user-profile/UserAddressCard.tsx](file://src/components/user-profile/UserAddressCard.tsx)
-- [src/components/ui/field.tsx](file://src/components/ui/field.tsx)
-- [src/components/ui/input.tsx](file://src/components/ui/input.tsx)
-- [src/components/ui/select.tsx](file://src/components/ui/select.tsx)
-- [src/components/ui/table.tsx](file://src/components/ui/table.tsx)
-- [src/components/ui/pagination.tsx](file://src/components/ui/pagination.tsx)
-- [src/components/ui/label.tsx](file://src/components/ui/label.tsx)
-- [src/components/ui/separator.tsx](file://src/components/ui/separator.tsx)
-- [src/app/(admin)/(ui-elements)/buttons/page.tsx](file://src/app/(admin)/(ui-elements)/buttons/page.tsx)
-- [src/app/(admin)/(ui-elements)/badge/page.tsx](file://src/app/(admin)/(ui-elements)/badge/page.tsx)
-- [src/app/(admin)/(ui-elements)/avatars/page.tsx](file://src/app/(admin)/(ui-elements)/avatars/page.tsx)
-- [src/app/(admin)/(ui-elements)/alerts/page.tsx](file://src/app/(admin)/(ui-elements)/alerts/page.tsx)
-- [src/app/(admin)/(ui-elements)/modals/page.tsx](file://src/app/(admin)/(ui-elements)/modals/page.tsx)
-- [src/app/(admin)/(ui-elements)/videos/page.tsx](file://src/app/(admin)/(ui-elements)/videos/page.tsx)
-- [src/app/(admin)/(others-pages)/(forms)/form-elements/page.tsx](file://src/app/(admin)/(others-pages)/(forms)/form-elements/page.tsx)
-- [src/app/(admin)/(others-pages)/(chart)/bar-chart/page.tsx](file://src/app/(admin)/(others-pages)/(chart)/bar-chart/page.tsx)
-- [src/app/(admin)/(others-pages)/(chart)/line-chart/page.tsx](file://src/app/(admin)/(others-pages)/(chart)/line-chart/page.tsx)
-- [src/app/(admin)/(others-pages)/(tables)/basic-tables/page.tsx](file://src/app/(admin)/(others-pages)/(tables)/basic-tables/page.tsx)
-- [src/app/globals.css](file://src/app/globals.css)
+- [src/components/ui/button/Button.tsx](file://apps/web/src/components/ui/button/Button.tsx)
+- [src/components/ui/badge/Badge.tsx](file://apps/web/src/components/ui/badge/Badge.tsx)
+- [src/components/ui/avatar/Avatar.tsx](file://apps/web/src/components/ui/avatar/Avatar.tsx)
+- [src/components/ui/avatar/AvatarText.tsx](file://apps/web/src/components/ui/avatar/AvatarText.tsx)
+- [src/components/ui/alert/Alert.tsx](file://apps/web/src/components/ui/alert/Alert.tsx)
+- [src/components/ui/modal/index.tsx](file://apps/web/src/components/ui/modal/index.tsx)
+- [src/components/ui/dropdown/Dropdown.tsx](file://apps/web/src/components/ui/dropdown/Dropdown.tsx)
+- [src/components/ui/table/index.tsx](file://apps/web/src/components/ui/table/index.tsx)
+- [src/components/ui/video/YoutubeEmbed.tsx](file://apps/web/src/components/ui/video/YoutubeEmbed.tsx)
+- [src/components/ui/sonner.tsx](file://apps/web/src/components/ui/sonner.tsx)
+- [src/components/ui/button.tsx](file://apps/web/src/components/ui/button.tsx)
+- [src/components/form/input/InputField.tsx](file://apps/web/src/components/form/input/InputField.tsx)
+- [src/components/form/Select.tsx](file://apps/web/src/components/form/Select.tsx)
+- [src/components/user-profile/UserInfoCard.tsx](file://apps/web/src/components/user-profile/UserInfoCard.tsx)
+- [src/components/user-profile/UserAddressCard.tsx](file://apps/web/src/components/user-profile/UserAddressCard.tsx)
+- [src/components/ui/field.tsx](file://apps/web/src/components/ui/field.tsx)
+- [src/components/ui/input.tsx](file://apps/web/src/components/ui/input.tsx)
+- [src/components/ui/select.tsx](file://apps/web/src/components/ui/select.tsx)
+- [src/components/ui/table.tsx](file://apps/web/src/components/ui/table.tsx)
+- [src/components/ui/pagination.tsx](file://apps/web/src/components/ui/pagination.tsx)
+- [src/components/ui/label.tsx](file://apps/web/src/components/ui/label.tsx)
+- [src/components/ui/separator.tsx](file://apps/web/src/components/ui/separator.tsx)
+- [src/components/ui/dialog.tsx](file://apps/web/src/components/ui/dialog.tsx)
+- [src/components/ui/avatar.tsx](file://apps/web/src/components/ui/avatar.tsx)
+- [src/components/ui/spinner.tsx](file://apps/web/src/components/ui/spinner.tsx)
+- [src/app/(admin)/(ui-elements)/buttons/page.tsx](file://apps/web/src/app/(admin)/(ui-elements)/buttons/page.tsx)
+- [src/app/(admin)/(ui-elements)/badge/page.tsx](file://apps/web/src/app/(admin)/(ui-elements)/badge/page.tsx)
+- [src/app/(admin)/(ui-elements)/avatars/page.tsx](file://apps/web/src/app/(admin)/(ui-elements)/avatars/page.tsx)
+- [src/app/(admin)/(ui-elements)/alerts/page.tsx](file://apps/web/src/app/(admin)/(ui-elements)/alerts/page.tsx)
+- [src/app/(admin)/(ui-elements)/modals/page.tsx](file://apps/web/src/app/(admin)/(ui-elements)/modals/page.tsx)
+- [src/app/(admin)/(ui-elements)/videos/page.tsx](file://apps/web/src/app/(admin)/(ui-elements)/videos/page.tsx)
+- [src/app/(admin)/(others-pages)/(forms)/form-elements/page.tsx](file://apps/web/src/app/(admin)/(others-pages)/(forms)/form-elements/page.tsx)
+- [src/app/(admin)/(others-pages)/(chart)/bar-chart/page.tsx](file://apps/web/src/app/(admin)/(others-pages)/(chart)/bar-chart/page.tsx)
+- [src/app/(admin)/(others-pages)/(chart)/line-chart/page.tsx](file://apps/web/src/app/(admin)/(others-pages)/(chart)/line-chart/page.tsx)
+- [src/app/(admin)/(others-pages)/(tables)/basic-tables/page.tsx](file://apps/web/src/app/(admin)/(others-pages)/(tables)/basic-tables/page.tsx)
+- [src/app/globals.css](file://apps/web/src/app/globals.css)
 </cite>
 
 ## 更新摘要
 **变更内容**
-- 新增现代化表单字段系统：Field、Input、Select 组件，提供更强大的表单构建能力
-- 替换旧表格组件系统，引入全新的 Table 和 Pagination 组件
-- 引入基于 Base UI 的现代化组件架构，提升可访问性和可维护性
-- 新增 FieldSet、FieldGroup、FieldContent 等表单布局组件
-- 统一使用 class-variance-authority 进行样式变体管理
+- 新增现代化对话框组件 Dialog，提供完整的对话框解决方案
+- 新增现代化头像组件 Avatar，支持多种尺寸和状态管理
+- 新增加载指示器组件 Spinner，提供统一的加载状态展示
+- 完善了 UI 组件库的现代化改造，统一了组件架构和样式系统
+- 扩展了组件示例页面，新增对话框和头像的专门演示页面
 
 ## 目录
 1. [简介](#简介)
@@ -58,12 +61,12 @@
 10. [附录](#附录)
 
 ## 简介
-本文件系统化梳理本仓库中的 UI 组件库，覆盖基础组件（按钮、输入框、徽章）、复合组件（图表、表格、模态框）、导航组件（下拉菜单、头像）、交互组件（提示、通知），并提供 API 文档、属性说明、使用示例与样式定制要点。文档同时关注响应式设计与无障碍访问兼容性，并给出组件组合与最佳实践建议。
+本文件系统化梳理本仓库中的 UI 组件库，覆盖基础组件（按钮、输入框、徽章）、复合组件（图表、表格、模态框）、导航组件（下拉菜单、头像）、交互组件（提示、通知、对话框），并提供 API 文档、属性说明、使用示例与样式定制要点。文档同时关注响应式设计与无障碍访问兼容性，并给出组件组合与最佳实践建议。
 
-**更新** 本版本重点反映了现代化组件架构的引入，包括全新的 Field 表单系统、基于 Base UI 的组件实现、以及更强大的表格和分页组件。
+**更新** 本版本重点反映了现代化组件架构的引入，包括全新的 Field 表单系统、基于 Base UI 的组件实现、现代化的对话框和头像组件，以及更强大的表格和分页组件。
 
 ## 项目结构
-UI 组件主要位于 src/components/ui 下，按功能域拆分：button、badge、avatar、alert、modal、dropdown、table、video、sonner 等；新增的现代化组件包括 field、input、select、table、pagination 等；示例页面位于 src/app 下的 UI 元素与示例区域，便于对照使用。
+UI 组件主要位于 apps/web/src/components/ui 下，按功能域拆分：button、badge、avatar、alert、modal、dropdown、table、video、sonner、dialog、avatar 等；新增的现代化组件包括 field、input、select、table、pagination、spinner 等；示例页面位于 apps/web/src/app 下的 UI 元素与示例区域，便于对照使用。
 
 ```mermaid
 graph TB
@@ -75,12 +78,14 @@ table["表格 Table<br/>现代化实现"]
 pagination["分页 Pagination<br/>完整实现"]
 label["标签 Label<br/>语义化标签"]
 separator["分隔线 Separator<br/>分割组件"]
+dialog["对话框 Dialog<br/>完整对话框系统"]
+avatar["头像 Avatar<br/>现代化头像组件"]
+spinner["加载指示器 Spinner<br/>统一加载状态"]
 end
 subgraph "传统组件"
 btn["按钮 Button"]
 btn2["按钮 ButtonPrimitive"]
 badge["徽章 Badge"]
-avatar["头像 Avatar"]
 avatarText["头像文本 AvatarText"]
 alert["提示 Alert"]
 modal["模态框 Modal"]
@@ -106,6 +111,7 @@ chartLinePage["折线图页"]
 tablePage["基础表格页"]
 userInfoPage["用户信息页"]
 userAddressPage["用户地址页"]
+dialogPage["对话框演示页"]
 end
 field --> formPage
 input --> formPage
@@ -114,6 +120,9 @@ table --> tablePage
 pagination --> tablePage
 label --> formPage
 separator --> formPage
+dialog --> dialogPage
+avatar --> avatarPage
+spinner --> dialogPage
 btnPage --> btn
 badgePage --> badge
 avatarPage --> avatar
@@ -133,13 +142,16 @@ userAddressPage --> userAddress
 ```
 
 **图表来源**
-- [src/components/ui/field.tsx:1-239](file://src/components/ui/field.tsx#L1-L239)
-- [src/components/ui/input.tsx:1-21](file://src/components/ui/input.tsx#L1-L21)
-- [src/components/ui/select.tsx:1-202](file://src/components/ui/select.tsx#L1-L202)
-- [src/components/ui/table.tsx:1-117](file://src/components/ui/table.tsx#L1-L117)
-- [src/components/ui/pagination.tsx:1-131](file://src/components/ui/pagination.tsx#L1-L131)
-- [src/components/ui/label.tsx:1-21](file://src/components/ui/label.tsx#L1-L21)
-- [src/components/ui/separator.tsx:1-26](file://src/components/ui/separator.tsx#L1-L26)
+- [src/components/ui/field.tsx:1-239](file://apps/web/src/components/ui/field.tsx#L1-L239)
+- [src/components/ui/input.tsx:1-21](file://apps/web/src/components/ui/input.tsx#L1-L21)
+- [src/components/ui/select.tsx:1-202](file://apps/web/src/components/ui/select.tsx#L1-L202)
+- [src/components/ui/table.tsx:1-117](file://apps/web/src/components/ui/table.tsx#L1-L117)
+- [src/components/ui/pagination.tsx:1-131](file://apps/web/src/components/ui/pagination.tsx#L1-L131)
+- [src/components/ui/label.tsx:1-21](file://apps/web/src/components/ui/label.tsx#L1-L21)
+- [src/components/ui/separator.tsx:1-26](file://apps/web/src/components/ui/separator.tsx#L1-L26)
+- [src/components/ui/dialog.tsx:1-161](file://apps/web/src/components/ui/dialog.tsx#L1-L161)
+- [src/components/ui/avatar.tsx:1-110](file://apps/web/src/components/ui/avatar.tsx#L1-L110)
+- [src/components/ui/spinner.tsx:1-11](file://apps/web/src/components/ui/spinner.tsx#L1-L11)
 
 ## 核心组件
 - **现代化表单系统**：Field、Input、Select 组件，基于 Base UI 提供更好的可访问性和样式变体管理
@@ -147,6 +159,9 @@ userAddressPage --> userAddress
 - **完整分页系统**：Pagination 组件，提供完整的分页导航功能
 - **语义化标签**：Label 组件，提供语义化的表单标签
 - **分割组件**：Separator 组件，用于内容分隔
+- **现代化对话框系统**：Dialog 组件族，提供完整的对话框解决方案
+- **现代化头像系统**：Avatar 组件族，支持多种尺寸和状态管理
+- **加载指示器**：Spinner 组件，提供统一的加载状态展示
 - **传统组件**：按钮、徽章、头像、提示、模态框、下拉菜单、通知等保持不变
 
 **更新** 新增的现代化组件完全基于 Base UI 架构，提供更好的可访问性、样式变体管理和开发体验。
@@ -156,25 +171,188 @@ userAddressPage --> userAddress
 
 ```mermaid
 graph TB
-A["示例页面<br/>src/app/*"] --> B["现代化组件<br/>src/components/ui/*"]
-A --> C["传统组件<br/>src/components/ui/*"]
+A["示例页面<br/>apps/web/src/app/*"] --> B["现代化组件<br/>apps/web/src/components/ui/*"]
+A --> C["传统组件<br/>apps/web/src/components/ui/*"]
 B --> D["表单组件<br/>Field/Input/Select"]
 B --> E["表格组件<br/>Table/Pagination"]
 B --> F["辅助组件<br/>Label/Separator"]
-C --> G["基础组件<br/>Button/Badge/Avatar"]
-C --> H["交互组件<br/>Alert/Modal/Dropdown"]
-C --> I["复合组件<br/>图表/视频/通知"]
-D --> J["集成场景<br/>表单/数据展示"]
-E --> J
-F --> J
-G --> J
-H --> J
-I --> J
-J --> K["样式变体系统<br/>class-variance-authority"]
-J --> L["可访问性支持<br/>Base UI"]
+B --> G["对话框组件<br/>Dialog 系统"]
+B --> H["头像组件<br/>Avatar 系统"]
+B --> I["加载组件<br/>Spinner"]
+C --> J["基础组件<br/>Button/Badge/Avatar"]
+C --> K["交互组件<br/>Alert/Modal/Dropdown"]
+C --> L["复合组件<br/>图表/视频/通知"]
+D --> M["集成场景<br/>表单/数据展示"]
+E --> M
+F --> M
+G --> M
+H --> M
+I --> M
+J --> M
+K --> M
+L --> M
+M --> N["样式变体系统<br/>class-variance-authority"]
+M --> O["可访问性支持<br/>Base UI"]
 ```
 
 ## 详细组件分析
+
+### 对话框组件 Dialog
+
+#### Dialog 根组件
+- **功能概述**：对话框根容器，提供完整的对话框生命周期管理
+- **关键属性**：继承 DialogPrimitive.Root 的所有属性
+- **交互行为**：管理对话框的打开/关闭状态，支持键盘导航
+- **样式定制**：基于 data-slot="dialog" 的样式系统
+- **无障碍与响应式**：使用 role="dialog" 和 aria-modal 属性，支持键盘导航
+
+```mermaid
+classDiagram
+class Dialog {
++className : string
+}
+class DialogTrigger {
++className : string
+}
+class DialogPortal {
++className : string
+}
+class DialogOverlay {
++className : string
+}
+class DialogContent {
++className : string
++showCloseButton : boolean
+}
+class DialogHeader {
++className : string
+}
+class DialogFooter {
++className : string
++showCloseButton : boolean
+}
+class DialogTitle {
++className : string
+}
+class DialogDescription {
++className : string
+}
+Dialog --> DialogTrigger
+Dialog --> DialogPortal
+DialogPortal --> DialogOverlay
+DialogPortal --> DialogContent
+DialogContent --> DialogHeader
+DialogContent --> DialogFooter
+DialogContent --> DialogTitle
+DialogContent --> DialogDescription
+```
+
+**图表来源**
+- [src/components/ui/dialog.tsx:10-12](file://apps/web/src/components/ui/dialog.tsx#L10-L12)
+- [src/components/ui/dialog.tsx:14-16](file://apps/web/src/components/ui/dialog.tsx#L14-L16)
+- [src/components/ui/dialog.tsx:18-20](file://apps/web/src/components/ui/dialog.tsx#L18-L20)
+- [src/components/ui/dialog.tsx:26-40](file://apps/web/src/components/ui/dialog.tsx#L26-L40)
+- [src/components/ui/dialog.tsx:42-81](file://apps/web/src/components/ui/dialog.tsx#L42-L81)
+- [src/components/ui/dialog.tsx:83-91](file://apps/web/src/components/ui/dialog.tsx#L83-L91)
+- [src/components/ui/dialog.tsx:93-118](file://apps/web/src/components/ui/dialog.tsx#L93-L118)
+- [src/components/ui/dialog.tsx:120-131](file://apps/web/src/components/ui/dialog.tsx#L120-L131)
+- [src/components/ui/dialog.tsx:133-147](file://apps/web/src/components/ui/dialog.tsx#L133-L147)
+
+**章节来源**
+- [src/components/ui/dialog.tsx:1-161](file://apps/web/src/components/ui/dialog.tsx#L1-L161)
+
+#### DialogContent 组件
+- **功能概述**：对话框主要内容容器，支持可选的关闭按钮
+- **关键属性**
+  - showCloseButton：是否显示关闭按钮（默认 true）
+  - className：自定义样式类
+- **交互行为**：包含对话框主体内容和可选关闭按钮
+- **样式定制**：固定定位、居中对齐、圆角边框、阴影效果
+- **无障碍与响应式**：支持动画过渡效果，响应式宽度适配
+
+**章节来源**
+- [src/components/ui/dialog.tsx:42-81](file://apps/web/src/components/ui/dialog.tsx#L42-L81)
+
+#### DialogHeader 和 DialogFooter 组件
+- **功能概述**：对话框头部和尾部容器，提供内容分组
+- **关键属性**：标准 div 元素属性
+- **交互行为**：静态布局容器，支持子组件排列
+- **样式定制**：头部垂直布局，尾部响应式布局
+- **无障碍与响应式**：支持响应式断点适配
+
+**章节来源**
+- [src/components/ui/dialog.tsx:83-118](file://apps/web/src/components/ui/dialog.tsx#L83-L118)
+
+### 现代化头像组件 Avatar
+
+#### Avatar 根组件
+- **功能概述**：现代化头像组件，支持多种尺寸和状态管理
+- **关键属性**
+  - size：头像尺寸（default | sm | lg，默认 default）
+  - className：自定义样式类
+- **交互行为**：作为头像根容器，管理内部状态
+- **样式定制**：基于 data-size 属性的尺寸变体
+- **无障碍与响应式**：支持混合模式和响应式尺寸
+
+```mermaid
+classDiagram
+class Avatar {
++size : "default"|"sm"|"lg"
++className : string
+}
+class AvatarImage {
++className : string
+}
+class AvatarFallback {
++className : string
+}
+class AvatarBadge {
++className : string
+}
+class AvatarGroup {
++className : string
+}
+class AvatarGroupCount {
++className : string
+}
+Avatar --> AvatarImage
+Avatar --> AvatarFallback
+Avatar --> AvatarBadge
+AvatarGroup --> Avatar
+AvatarGroup --> AvatarGroupCount
+```
+
+**图表来源**
+- [src/components/ui/avatar.tsx:8-26](file://apps/web/src/components/ui/avatar.tsx#L8-L26)
+- [src/components/ui/avatar.tsx:28-39](file://apps/web/src/components/ui/avatar.tsx#L28-L39)
+- [src/components/ui/avatar.tsx:41-55](file://apps/web/src/components/ui/avatar.tsx#L41-L55)
+- [src/components/ui/avatar.tsx:57-71](file://apps/web/src/components/ui/avatar.tsx#L57-L71)
+- [src/components/ui/avatar.tsx:73-100](file://apps/web/src/components/ui/avatar.tsx#L73-L100)
+
+**章节来源**
+- [src/components/ui/avatar.tsx:1-110](file://apps/web/src/components/ui/avatar.tsx#L1-L110)
+
+#### AvatarGroup 组件
+- **功能概述**：头像组容器，支持头像重叠显示和计数
+- **关键属性**：标准 div 元素属性
+- **交互行为**：管理多个头像的重叠排列和计数显示
+- **样式定制**：负间距排列，边框环绕效果
+- **无障碍与响应式**：支持不同尺寸的头像组
+
+**章节来源**
+- [src/components/ui/avatar.tsx:73-100](file://apps/web/src/components/ui/avatar.tsx#L73-L100)
+
+### 加载指示器 Spinner
+
+#### Spinner 组件
+- **功能概述**：统一的加载指示器组件
+- **关键属性**：继承 SVG 元素的所有属性
+- **交互行为**：提供旋转动画效果
+- **样式定制**：基于 size-4 和 animate-spin 的样式
+- **无障碍与响应式**：使用 role="status" 和 aria-label 提供可访问性
+
+**章节来源**
+- [src/components/ui/spinner.tsx:1-11](file://apps/web/src/components/ui/spinner.tsx#L1-L11)
 
 ### 表单字段系统 Field
 
@@ -208,13 +386,13 @@ Field --> FieldContent
 ```
 
 **图表来源**
-- [src/components/ui/field.tsx:72-86](file://src/components/ui/field.tsx#L72-L86)
-- [src/components/ui/field.tsx:10-21](file://src/components/ui/field.tsx#L10-L21)
-- [src/components/ui/field.tsx:41-52](file://src/components/ui/field.tsx#L41-L52)
-- [src/components/ui/field.tsx:88-99](file://src/components/ui/field.tsx#L88-L99)
+- [src/components/ui/field.tsx:72-86](file://apps/web/src/components/ui/field.tsx#L72-L86)
+- [src/components/ui/field.tsx:10-21](file://apps/web/src/components/ui/field.tsx#L10-L21)
+- [src/components/ui/field.tsx:41-52](file://apps/web/src/components/ui/field.tsx#L41-L52)
+- [src/components/ui/field.tsx:88-99](file://apps/web/src/components/ui/field.tsx#L88-L99)
 
 **章节来源**
-- [src/components/ui/field.tsx:72-86](file://src/components/ui/field.tsx#L72-L86)
+- [src/components/ui/field.tsx:72-86](file://apps/web/src/components/ui/field.tsx#L72-L86)
 
 #### FieldLabel 组件
 - **功能概述**：表单字段标签，支持与输入组件的关联
@@ -224,7 +402,7 @@ Field --> FieldContent
 - **无障碍与响应式**：支持禁用状态和焦点可见性
 
 **章节来源**
-- [src/components/ui/field.tsx:101-116](file://src/components/ui/field.tsx#L101-L116)
+- [src/components/ui/field.tsx:101-116](file://apps/web/src/components/ui/field.tsx#L101-L116)
 
 #### FieldDescription 组件
 - **功能概述**：表单字段描述文本，提供额外的说明信息
@@ -234,7 +412,7 @@ Field --> FieldContent
 - **无障碍与响应式**：支持链接样式和可访问性
 
 **章节来源**
-- [src/components/ui/field.tsx:131-144](file://src/components/ui/field.tsx#L131-L144)
+- [src/components/ui/field.tsx:131-144](file://apps/web/src/components/ui/field.tsx#L131-L144)
 
 #### FieldError 组件
 - **功能概述**：表单字段错误信息展示，支持单个和多个错误
@@ -246,7 +424,7 @@ Field --> FieldContent
 - **无障碍与响应式**：使用 role="alert" 提供可访问性支持
 
 **章节来源**
-- [src/components/ui/field.tsx:176-225](file://src/components/ui/field.tsx#L176-L225)
+- [src/components/ui/field.tsx:176-225](file://apps/web/src/components/ui/field.tsx#L176-L225)
 
 ### 现代化输入框 Input
 
@@ -257,19 +435,8 @@ Field --> FieldContent
 - **样式定制**：基于 data-slot="input" 的样式系统
 - **无障碍与响应式**：支持禁用状态、无效状态和焦点环
 
-```mermaid
-classDiagram
-class Input {
-+type : string
-+className : string
-}
-```
-
-**图表来源**
-- [src/components/ui/input.tsx:6-18](file://src/components/ui/input.tsx#L6-L18)
-
 **章节来源**
-- [src/components/ui/input.tsx:1-21](file://src/components/ui/input.tsx#L1-L21)
+- [src/components/ui/input.tsx:1-21](file://apps/web/src/components/ui/input.tsx#L1-L21)
 
 ### 现代化选择框 Select
 
@@ -285,34 +452,8 @@ class Input {
   - SelectSeparator：分隔线
   - SelectScrollUpButton/SelectScrollDownButton：滚动按钮
 
-```mermaid
-classDiagram
-class Select {
-+className : string
-}
-class SelectTrigger {
-+size : "sm"|"default"
-+className : string
-}
-class SelectContent {
-+side : string
-+align : string
-+className : string
-}
-class SelectItem {
-+className : string
-}
-Select --> SelectTrigger
-Select --> SelectContent
-SelectContent --> SelectItem
-```
-
-**图表来源**
-- [src/components/ui/select.tsx:9-57](file://src/components/ui/select.tsx#L9-L57)
-- [src/components/ui/select.tsx:111-137](file://src/components/ui/select.tsx#L111-L137)
-
 **章节来源**
-- [src/components/ui/select.tsx:1-202](file://src/components/ui/select.tsx#L1-L202)
+- [src/components/ui/select.tsx:1-202](file://apps/web/src/components/ui/select.tsx#L1-L202)
 
 ### 现代化表格 Table
 
@@ -325,42 +466,8 @@ SelectContent --> SelectItem
   - TableHead/TableCell：表头和单元格
   - TableCaption：表格标题
 
-```mermaid
-classDiagram
-class Table {
-+className : string
-}
-class TableHeader {
-+className : string
-}
-class TableBody {
-+className : string
-}
-class TableRow {
-+className : string
-}
-class TableHead {
-+className : string
-}
-class TableCell {
-+className : string
-}
-Table --> TableHeader
-Table --> TableBody
-TableBody --> TableRow
-TableHeader --> TableRow
-TableRow --> TableHead
-TableRow --> TableCell
-```
-
-**图表来源**
-- [src/components/ui/table.tsx:7-20](file://src/components/ui/table.tsx#L7-L20)
-- [src/components/ui/table.tsx:22-40](file://src/components/ui/table.tsx#L22-L40)
-- [src/components/ui/table.tsx:55-66](file://src/components/ui/table.tsx#L55-L66)
-- [src/components/ui/table.tsx:68-92](file://src/components/ui/table.tsx#L68-L92)
-
 **章节来源**
-- [src/components/ui/table.tsx:1-117](file://src/components/ui/table.tsx#L1-L117)
+- [src/components/ui/table.tsx:1-117](file://apps/web/src/components/ui/table.tsx#L1-L117)
 
 ### 分页 Pagination
 
@@ -374,42 +481,8 @@ TableRow --> TableCell
   - PaginationPrevious/PaginationNext：前后页按钮
   - PaginationEllipsis：省略号
 
-```mermaid
-classDiagram
-class Pagination {
-+className : string
-}
-class PaginationContent {
-+className : string
-}
-class PaginationLink {
-+isActive : boolean
-+size : string
-+className : string
-}
-class PaginationPrevious {
-+text : string
-+className : string
-}
-class PaginationNext {
-+text : string
-+className : string
-}
-Pagination --> PaginationContent
-PaginationContent --> PaginationItem
-PaginationContent --> PaginationLink
-PaginationContent --> PaginationPrevious
-PaginationContent --> PaginationNext
-```
-
-**图表来源**
-- [src/components/ui/pagination.tsx:7-17](file://src/components/ui/pagination.tsx#L7-L17)
-- [src/components/ui/pagination.tsx:19-30](file://src/components/ui/pagination.tsx#L19-L30)
-- [src/components/ui/pagination.tsx:41-63](file://src/components/ui/pagination.tsx#L41-L63)
-- [src/components/ui/pagination.tsx:65-99](file://src/components/ui/pagination.tsx#L65-L99)
-
 **章节来源**
-- [src/components/ui/pagination.tsx:1-131](file://src/components/ui/pagination.tsx#L1-L131)
+- [src/components/ui/pagination.tsx:1-131](file://apps/web/src/components/ui/pagination.tsx#L1-L131)
 
 ### 语义化标签 Label
 
@@ -421,7 +494,7 @@ PaginationContent --> PaginationNext
 - **无障碍与响应式**：支持禁用状态和焦点可见性
 
 **章节来源**
-- [src/components/ui/label.tsx:1-21](file://src/components/ui/label.tsx#L1-L21)
+- [src/components/ui/label.tsx:1-21](file://apps/web/src/components/ui/label.tsx#L1-L21)
 
 ### 分隔线 Separator
 
@@ -435,7 +508,7 @@ PaginationContent --> PaginationNext
 - **无障碍与响应式**：支持水平和垂直两种方向
 
 **章节来源**
-- [src/components/ui/separator.tsx:1-26](file://src/components/ui/separator.tsx#L1-L26)
+- [src/components/ui/separator.tsx:1-26](file://apps/web/src/components/ui/separator.tsx#L1-L26)
 
 ### 传统组件（保持不变）
 
@@ -446,7 +519,7 @@ PaginationContent --> PaginationNext
 - **样式定制**：与原有组件相同
 
 **章节来源**
-- [src/components/ui/button/Button.tsx:15-57](file://src/components/ui/button/Button.tsx#L15-L57)
+- [src/components/ui/button/Button.tsx:15-57](file://apps/web/src/components/ui/button/Button.tsx#L15-L57)
 
 #### 徽章 Badge
 - **功能概述**：用于标记状态、标签或等级
@@ -455,7 +528,7 @@ PaginationContent --> PaginationNext
 - **样式定制**：与原有组件相同
 
 **章节来源**
-- [src/components/ui/badge/Badge.tsx:23-80](file://src/components/ui/badge/Badge.tsx#L23-L80)
+- [src/components/ui/badge/Badge.tsx:23-80](file://apps/web/src/components/ui/badge/Badge.tsx#L23-L80)
 
 #### 头像 Avatar
 - **功能概述**：用户头像展示
@@ -464,7 +537,7 @@ PaginationContent --> PaginationNext
 - **样式定制**：与原有组件相同
 
 **章节来源**
-- [src/components/ui/avatar/Avatar.tsx:35-66](file://src/components/ui/avatar/Avatar.tsx#L35-L66)
+- [src/components/ui/avatar/Avatar.tsx:35-66](file://apps/web/src/components/ui/avatar/Avatar.tsx#L35-L66)
 
 #### 提示 Alert
 - **功能概述**：用于展示成功/错误/警告/信息类提示
@@ -473,7 +546,7 @@ PaginationContent --> PaginationNext
 - **样式定制**：与原有组件相同
 
 **章节来源**
-- [src/components/ui/alert/Alert.tsx:13-146](file://src/components/ui/alert/Alert.tsx#L13-L146)
+- [src/components/ui/alert/Alert.tsx:13-146](file://apps/web/src/components/ui/alert/Alert.tsx#L13-L146)
 
 #### 模态框 Modal
 - **功能概述**：弹出式对话框
@@ -482,7 +555,7 @@ PaginationContent --> PaginationNext
 - **样式定制**：与原有组件相同
 
 **章节来源**
-- [src/components/ui/modal/index.tsx:13-96](file://src/components/ui/modal/index.tsx#L13-L96)
+- [src/components/ui/modal/index.tsx:13-96](file://apps/web/src/components/ui/modal/index.tsx#L13-L96)
 
 #### 下拉菜单 Dropdown
 - **功能概述**：从右上角弹出的菜单容器
@@ -491,7 +564,7 @@ PaginationContent --> PaginationNext
 - **样式定制**：与原有组件相同
 
 **章节来源**
-- [src/components/ui/dropdown/Dropdown.tsx:12-49](file://src/components/ui/dropdown/Dropdown.tsx#L12-L49)
+- [src/components/ui/dropdown/Dropdown.tsx:12-49](file://apps/web/src/components/ui/dropdown/Dropdown.tsx#L12-L49)
 
 #### 通知 Toaster
 - **功能概述**：全局通知展示
@@ -500,7 +573,7 @@ PaginationContent --> PaginationNext
 - **样式定制**：与原有组件相同
 
 **章节来源**
-- [src/components/ui/sonner.tsx:8-32](file://src/components/ui/sonner.tsx#L8-L32)
+- [src/components/ui/sonner.tsx:8-32](file://apps/web/src/components/ui/sonner.tsx#L8-L32)
 
 ## 依赖关系分析
 - **现代化组件依赖**：基于 @base-ui/react-* 包，提供更好的可访问性
@@ -508,80 +581,116 @@ PaginationContent --> PaginationNext
 - **工具函数**：使用 cn 函数进行条件类名合并
 - **传统组件**：保持原有依赖关系，确保向后兼容
 - **新增依赖**：lucide-react 图标库，用于现代化组件的图标
+- **加载组件**：Spinner 组件依赖 lucide-react 的 Loader2Icon
 
 ```mermaid
 graph LR
-field["Field 系统"] --> baseUI["@base-ui/react"]
+dialog["对话框系统"] --> baseUI["@base-ui/react-dialog"]
+dialog --> button["Button 组件"]
+dialog --> lucide["lucide-react"]
+avatar["头像系统"] --> baseUI
+avatar --> cn["cn 工具函数"]
+spinner["加载指示器"] --> lucide
+field["Field 系统"] --> baseUI
 field --> cva["class-variance-authority"]
-field --> cn["cn 工具函数"]
+field --> cn
 input["Input"] --> baseUI
 select["Select 系统"] --> baseUI
-select --> lucide["lucide-react"]
+select --> lucide
 table["Table"] --> cn
-pagination["Pagination"] --> button["Button 组件"]
+pagination["Pagination"] --> button
 label["Label"] --> cn
 separator["Separator"] --> baseUI
 ```
 
 **图表来源**
-- [src/components/ui/field.tsx:3-8](file://src/components/ui/field.tsx#L3-L8)
-- [src/components/ui/input.tsx:1-4](file://src/components/ui/input.tsx#L1-L4)
-- [src/components/ui/select.tsx:3-7](file://src/components/ui/select.tsx#L3-L7)
-- [src/components/ui/pagination.tsx:4](file://src/components/ui/pagination.tsx#L4)
+- [src/components/ui/dialog.tsx:4](file://apps/web/src/components/ui/dialog.tsx#L4)
+- [src/components/ui/dialog.tsx:7](file://apps/web/src/components/ui/dialog.tsx#L7)
+- [src/components/ui/dialog.tsx:8](file://apps/web/src/components/ui/dialog.tsx#L8)
+- [src/components/ui/avatar.tsx:4](file://apps/web/src/components/ui/avatar.tsx#L4)
+- [src/components/ui/spinner.tsx:2](file://apps/web/src/components/ui/spinner.tsx#L2)
+- [src/components/ui/field.tsx:4](file://apps/web/src/components/ui/field.tsx#L4)
+- [src/components/ui/input.tsx:4](file://apps/web/src/components/ui/input.tsx#L4)
+- [src/components/ui/select.tsx:7](file://apps/web/src/components/ui/select.tsx#L7)
 
 ## 性能考虑
 - **现代化组件优化**：基于 Base UI 的组件具有更好的性能表现
 - **样式变体管理**：class-variance-authority 提供高效的样式变体计算
 - **条件渲染**：现代化组件使用 data-slot 属性，支持更精确的条件渲染
-- **传统组件保持**：原有组件经过优化，性能稳定可靠
 - **图标优化**：lucide-react 图标库支持 Tree Shaking
+- **对话框性能**：Dialog 组件使用 Portal 渲染，避免 DOM 树深度问题
+- **头像性能**：Avatar 组件支持回退机制，减少图片加载失败的影响
+- **传统组件保持**：原有组件经过优化，性能稳定可靠
 
-**更新** 新的现代化组件架构显著提升了组件的性能和开发体验。
+**更新** 新的现代化组件架构显著提升了组件的性能和开发体验，特别是对话框和头像组件的引入。
 
 ## 故障排查指南
+- **Dialog 组件布局问题**
+  - 检查 DialogPortal 是否正确渲染
+  - 确认 DialogOverlay 的定位和层级设置
+  - 参考路径：[src/components/ui/dialog.tsx:51-80](file://apps/web/src/components/ui/dialog.tsx#L51-L80)
+- **Avatar 组件尺寸问题**
+  - 检查 size 属性设置是否正确
+  - 确认 data-size 属性是否正确传递
+  - 参考路径：[src/components/ui/avatar.tsx:16-26](file://apps/web/src/components/ui/avatar.tsx#L16-L26)
+- **AvatarGroup 组件重叠问题**
+  - 检查 -space-x-2 样式的应用
+  - 确认边框环绕效果的实现
+  - 参考路径：[src/components/ui/avatar.tsx:75-84](file://apps/web/src/components/ui/avatar.tsx#L75-L84)
+- **Spinner 组件动画问题**
+  - 检查 animate-spin 类的添加
+  - 确认 role="status" 和 aria-label 的设置
+  - 参考路径：[src/components/ui/spinner.tsx:6](file://apps/web/src/components/ui/spinner.tsx#L6)
 - **Field 组件布局问题**
   - 检查 orientation 属性设置是否正确
   - 确认子组件是否正确使用 data-slot 属性
-  - 参考路径：[src/components/ui/field.tsx:54-70](file://src/components/ui/field.tsx#L54-L70)
+  - 参考路径：[src/components/ui/field.tsx:54-70](file://apps/web/src/components/ui/field.tsx#L54-L70)
 - **Input 组件样式异常**
   - 检查 data-slot="input" 样式是否被覆盖
   - 确认禁用状态和无效状态的样式类
-  - 参考路径：[src/components/ui/input.tsx:11-14](file://src/components/ui/input.tsx#L11-L14)
+  - 参考路径：[src/components/ui/input.tsx:11-14](file://apps/web/src/components/ui/input.tsx#L11-L14)
 - **Select 组件下拉异常**
   - 检查 SelectTrigger 的 size 属性
   - 确认 Portal 渲染是否正常
-  - 参考路径：[src/components/ui/select.tsx:31-57](file://src/components/ui/select.tsx#L31-L57)
+  - 参考路径：[src/components/ui/select.tsx:31-57](file://apps/web/src/components/ui/select.tsx#L31-L57)
 - **Table 组件溢出问题**
   - 检查 Table 容器的 overflow-x-auto 设置
   - 确认表格内容是否超出容器宽度
-  - 参考路径：[src/components/ui/table.tsx:9-19](file://src/components/ui/table.tsx#L9-L19)
+  - 参考路径：[src/components/ui/table.tsx:9-19](file://apps/web/src/components/ui/table.tsx#L9-L19)
 - **Pagination 组件状态问题**
   - 检查 isActive 属性是否正确传递
   - 确认按钮变体是否根据状态切换
-  - 参考路径：[src/components/ui/pagination.tsx:36-63](file://src/components/ui/pagination.tsx#L36-L63)
+  - 参考路径：[src/components/ui/pagination.tsx:36-63](file://apps/web/src/components/ui/pagination.tsx#L36-L63)
 - **传统组件兼容性**
   - 确保原有组件仍能正常工作
   - 检查样式类名是否与新架构冲突
-  - 参考路径：[src/components/ui/button/Button.tsx:15-57](file://src/components/ui/button/Button.tsx#L15-L57)
+  - 参考路径：[src/components/ui/button/Button.tsx:15-57](file://apps/web/src/components/ui/button/Button.tsx#L15-L57)
 
 **章节来源**
-- [src/components/ui/field.tsx:54-70](file://src/components/ui/field.tsx#L54-L70)
-- [src/components/ui/input.tsx:11-14](file://src/components/ui/input.tsx#L11-L14)
-- [src/components/ui/select.tsx:31-57](file://src/components/ui/select.tsx#L31-L57)
-- [src/components/ui/table.tsx:9-19](file://src/components/ui/table.tsx#L9-L19)
-- [src/components/ui/pagination.tsx:36-63](file://src/components/ui/pagination.tsx#L36-L63)
-- [src/components/ui/button/Button.tsx:15-57](file://src/components/ui/button/Button.tsx#L15-L57)
+- [src/components/ui/dialog.tsx:51-80](file://apps/web/src/components/ui/dialog.tsx#L51-L80)
+- [src/components/ui/avatar.tsx:16-26](file://apps/web/src/components/ui/avatar.tsx#L16-L26)
+- [src/components/ui/avatar.tsx:75-84](file://apps/web/src/components/ui/avatar.tsx#L75-L84)
+- [src/components/ui/spinner.tsx:6](file://apps/web/src/components/ui/spinner.tsx#L6)
+- [src/components/ui/field.tsx:54-70](file://apps/web/src/components/ui/field.tsx#L54-L70)
+- [src/components/ui/input.tsx:11-14](file://apps/web/src/components/ui/input.tsx#L11-L14)
+- [src/components/ui/select.tsx:31-57](file://apps/web/src/components/ui/select.tsx#L31-L57)
+- [src/components/ui/table.tsx:9-19](file://apps/web/src/components/ui/table.tsx#L9-L19)
+- [src/components/ui/pagination.tsx:36-63](file://apps/web/src/components/ui/pagination.tsx#L36-L63)
+- [src/components/ui/button/Button.tsx:15-57](file://apps/web/src/components/ui/button/Button.tsx#L15-L57)
 
 ## 结论
-本 UI 组件库已成功引入现代化的组件架构，包括全新的 Field 表单系统、基于 Base UI 的 Input 和 Select 组件、现代化的 Table 和 Pagination 组件。新架构提供了更好的可访问性、样式管理和开发体验，同时保持了与传统组件的向后兼容性。通过示例页面与组件 API 的清晰分离，开发者可以灵活选择适合的组件进行使用。
+本 UI 组件库已成功引入现代化的组件架构，包括全新的 Field 表单系统、基于 Base UI 的 Input 和 Select 组件、现代化的 Table 和 Pagination 组件、完整的 Dialog 对话框系统、现代化的 Avatar 头像组件，以及统一的 Spinner 加载指示器。新架构提供了更好的可访问性、样式管理和开发体验，同时保持了与传统组件的向后兼容性。通过示例页面与组件 API 的清晰分离，开发者可以灵活选择适合的组件进行使用。
 
-**更新** 最新版本实现了从传统组件架构到现代化组件架构的重大升级，为未来的组件开发奠定了坚实的基础。
+**更新** 最新版本实现了从传统组件架构到现代化组件架构的重大升级，新增的对话框和头像组件为应用提供了更丰富的交互体验，为未来的组件开发奠定了坚实的基础。
 
 ## 附录
 
 ### 组件使用示例与页面对照
 - **现代化表单系统**：Field、Input、Select 组件的使用示例
 - **现代化表格系统**：Table 和 Pagination 组件的使用示例
+- **现代化对话框系统**：Dialog 组件族的使用示例
+- **现代化头像系统**：Avatar 组件族的使用示例
+- **加载指示器**：Spinner 组件的使用示例
 - **传统组件**：保持原有页面对照关系
 - **新增页面**：现代化组件的专门示例页面
 
@@ -591,10 +700,15 @@ separator["Separator"] --> baseUI
 - **data-slot 属性**：统一的组件结构标识
 - **可访问性支持**：完整的 ARIA 属性和键盘导航
 - **响应式设计**：支持移动端和桌面端的适配
+- **Portal 渲染**：Dialog 组件使用 Portal 避免 DOM 树深度问题
+- **回退机制**：Avatar 组件支持图片加载失败时的回退处理
 
 **章节来源**
-- [src/components/ui/field.tsx:1-239](file://src/components/ui/field.tsx#L1-L239)
-- [src/components/ui/input.tsx:1-21](file://src/components/ui/input.tsx#L1-L21)
-- [src/components/ui/select.tsx:1-202](file://src/components/ui/select.tsx#L1-L202)
-- [src/components/ui/table.tsx:1-117](file://src/components/ui/table.tsx#L1-L117)
-- [src/components/ui/pagination.tsx:1-131](file://src/components/ui/pagination.tsx#L1-L131)
+- [src/components/ui/dialog.tsx:1-161](file://apps/web/src/components/ui/dialog.tsx#L1-L161)
+- [src/components/ui/avatar.tsx:1-110](file://apps/web/src/components/ui/avatar.tsx#L1-L110)
+- [src/components/ui/spinner.tsx:1-11](file://apps/web/src/components/ui/spinner.tsx#L1-L11)
+- [src/components/ui/field.tsx:1-239](file://apps/web/src/components/ui/field.tsx#L1-L239)
+- [src/components/ui/input.tsx:1-21](file://apps/web/src/components/ui/input.tsx#L1-L21)
+- [src/components/ui/select.tsx:1-202](file://apps/web/src/components/ui/select.tsx#L1-L202)
+- [src/components/ui/table.tsx:1-117](file://apps/web/src/components/ui/table.tsx#L1-L117)
+- [src/components/ui/pagination.tsx:1-131](file://apps/web/src/components/ui/pagination.tsx#L1-L131)
