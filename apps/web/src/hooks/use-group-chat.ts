@@ -32,6 +32,7 @@ export function useGroupChat(defaultRoom: string) {
   const { socket, connected } = useSocket();
   const [myUser, setMyUser] = useState<UserInfo | null>(null);
   const [room, setRoom] = useState(defaultRoom);
+  const roomRef = useRef(defaultRoom);
   const [onlineUsers, setOnlineUsers] = useState<UserInfo[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [messageInput, setMessageInput] = useState("");
@@ -87,9 +88,18 @@ export function useGroupChat(defaultRoom: string) {
     };
 
     const onMessage = (payload: {
-      data: { id: string; user: UserInfo; content: string; time: number };
+      data: {
+        id: string;
+        room?: string;
+        user: UserInfo;
+        content: string;
+        time: number;
+      };
     }) => {
       const d = payload.data;
+      // Only show messages for the current room
+      const currentRoom = roomRef.current;
+      if (d.room && d.room !== currentRoom) return;
       appendMessage({
         id: d.id,
         type: "chat",
@@ -97,6 +107,20 @@ export function useGroupChat(defaultRoom: string) {
         content: d.content,
         time: d.time,
       });
+    };
+
+    const onRoomHistory = (payload: {
+      data: { id: string; user: UserInfo; content: string; time: number }[];
+    }) => {
+      // Replace messages with history (oldest first)
+      const history: ChatMessage[] = payload.data.map((m) => ({
+        id: m.id,
+        type: "chat" as const,
+        user: m.user,
+        content: m.content,
+        time: m.time,
+      }));
+      setMessages(history);
     };
 
     const onWeather = (payload: { data: WeatherSnapshot }) => {
@@ -119,6 +143,7 @@ export function useGroupChat(defaultRoom: string) {
     socket.on("server:user-left", onUserLeft);
     socket.on("server:room-users", onRoomUsers);
     socket.on("server:message", onMessage);
+    socket.on("server:room-history", onRoomHistory);
     socket.on("server:weather", onWeather);
     socket.on("disconnect", onDisconnect);
 
@@ -128,6 +153,7 @@ export function useGroupChat(defaultRoom: string) {
       socket.off("server:user-left", onUserLeft);
       socket.off("server:room-users", onRoomUsers);
       socket.off("server:message", onMessage);
+      socket.off("server:room-history", onRoomHistory);
       socket.off("server:weather", onWeather);
       socket.off("disconnect", onDisconnect);
       setWeather(null);
@@ -141,11 +167,20 @@ export function useGroupChat(defaultRoom: string) {
     [socket],
   );
 
-  const joinRoom = useCallback(() => {
-    const nextRoom = room.trim();
-    if (!nextRoom || !myUser) return;
-    socket?.emit("client:join", { room: nextRoom });
-  }, [socket, room, myUser]);
+  const joinRoom = useCallback(
+    (roomName?: string) => {
+      const nextRoom = (roomName ?? room).trim();
+      if (!nextRoom || !myUser) return;
+      if (roomName) {
+        setRoom(roomName);
+        roomRef.current = roomName;
+      }
+      // Clear messages when switching rooms
+      setMessages([]);
+      socket?.emit("client:join", { room: nextRoom });
+    },
+    [socket, room, myUser],
+  );
 
   const sendMessage = useCallback(() => {
     const content = messageInput.trim();

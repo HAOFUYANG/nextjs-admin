@@ -14,6 +14,9 @@ import { RealtimeService } from './realtime.service';
 import { WeatherService } from '../weather/weather.service';
 import { BaseRealtimeGateway } from './base-realtime.gateway';
 import { UserStore } from './user.store';
+import { UserService } from '../user/user.service';
+import { MessageService } from '../message/message.service';
+import { RoomService } from '../room/room.service';
 
 @Injectable()
 @WebSocketGateway({
@@ -38,6 +41,9 @@ export class RealtimeGateway
     private readonly realtimeService: RealtimeService,
     private readonly weatherService: WeatherService,
     private readonly userStore: UserStore,
+    private readonly userService: UserService,
+    private readonly messageService: MessageService,
+    private readonly roomService: RoomService,
   ) {
     super();
   }
@@ -61,7 +67,7 @@ export class RealtimeGateway
   }
 
   @SubscribeMessage('client:login')
-  onLogin(
+  async onLogin(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { nickname?: string; avatarIndex?: number },
   ) {
@@ -74,13 +80,23 @@ export class RealtimeGateway
       return;
     }
     const avatarIndex = payload?.avatarIndex ?? 1;
+
+    // Find or create persistent user in DB
+    const dbUser = await this.userService.findOrCreate(nickname, avatarIndex);
+
+    // Also store in memory for fast socket-based lookups
     const user = this.userStore.create(client.id, nickname, avatarIndex, '');
+    // Attach the persistent DB user ID for future DB operations
+    (user as any).dbUserId = dbUser.id;
+
     client.emit('server:user-info', this.realtimeService.buildUserInfo(user));
-    this.logger.log(`user logged in: ${nickname} (${client.id})`);
+    this.logger.log(
+      `user logged in: ${nickname} (${client.id}, dbId: ${dbUser.id})`,
+    );
   }
 
   @SubscribeMessage('client:join')
-  onJoin(
+  async onJoin(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { room?: string },
   ) {
@@ -102,6 +118,15 @@ export class RealtimeGateway
       return;
     }
 
+    // Leave previous room before joining new one
+    if (user.room && user.room !== room) {
+      void client.leave(user.room);
+      // Notify old room about user leaving
+      this.server
+        .to(user.room)
+        .emit('server:user-left', this.realtimeService.buildUserLeft(user));
+    }
+
     void client.join(room);
     this.userStore.updateRoom(client.id, room);
 
@@ -117,11 +142,25 @@ export class RealtimeGateway
       this.realtimeService.buildRoomUsers(roomUsers),
     );
 
+    // Send recent message history for this room
+    try {
+      const dbRoom = await this.roomService.findByName(room);
+      if (dbRoom) {
+        const history = await this.messageService.findByRoom(dbRoom.id, 50);
+        client.emit(
+          'server:room-history',
+          this.realtimeService.buildRoomHistory(history),
+        );
+      }
+    } catch (err) {
+      this.logger.error('Failed to load room history');
+    }
+
     this.logger.log(`${user.nickname} joined room ${room}`);
   }
 
   @SubscribeMessage('client:message')
-  onMessage(
+  async onMessage(
     @ConnectedSocket() client: Socket,
     @MessageBody() payload: { room?: string; content?: string },
   ) {
@@ -147,12 +186,29 @@ export class RealtimeGateway
       return;
     }
 
-    this.server
-      .to(room)
-      .emit(
-        'server:message',
-        this.realtimeService.buildChatMessage(user, content),
-      );
+    // Persist message to DB
+    let dbMessageId: string | undefined;
+    try {
+      const dbUser = await this.userService.findByNickname(user.nickname);
+      const dbRoom = await this.roomService.findByName(room);
+      if (dbUser && dbRoom) {
+        const saved = await this.messageService.create(
+          dbRoom.id,
+          dbUser.id,
+          content,
+        );
+        dbMessageId = saved.id;
+      }
+    } catch (err) {
+      this.logger.error('Failed to persist message to DB');
+    }
+
+    // Broadcast to room (use DB id if available)
+    const event = this.realtimeService.buildChatMessage(user, content, room);
+    if (dbMessageId) {
+      (event.data as any).id = dbMessageId;
+    }
+    this.server.to(room).emit('server:message', event);
   }
 
   @SubscribeMessage('client:ping')

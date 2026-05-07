@@ -60,9 +60,10 @@ export class RealtimeService {
     );
   }
 
-  buildChatMessage(user: ChatUser, content: string) {
+  buildChatMessage(user: ChatUser, content: string, room?: string) {
     return this.createEvent('server.message', {
-      id: randomUUID(),
+      id: randomUUID() as `${string}-${string}-${string}-${string}-${string}`,
+      room,
       user: {
         id: user.id,
         nickname: user.nickname,
@@ -71,6 +72,25 @@ export class RealtimeService {
       content,
       time: Date.now(),
     });
+  }
+
+  buildRoomHistory(
+    messages: {
+      id: string;
+      content: string;
+      createdAt: Date;
+      user: { id: string; nickname: string; avatarIndex: number };
+    }[],
+  ) {
+    return this.createEvent(
+      'server.room-history',
+      messages.map((m) => ({
+        id: m.id,
+        user: m.user,
+        content: m.content,
+        time: new Date(m.createdAt).getTime(),
+      })),
+    );
   }
 
   buildWeather(snapshot: WeatherSnapshot) {
