@@ -108,6 +108,7 @@ const Socket: React.FC = () => {
   const {
     connected,
     myUser,
+    showLogin,
     room,
     setRoom,
     onlineUsers,
@@ -115,10 +116,13 @@ const Socket: React.FC = () => {
     messageInput,
     setMessageInput,
     login,
+    switchUser,
     joinRoom,
     sendMessage,
     messagesEndRef,
     weather,
+    mentions,
+    roomDbMembers,
   } = useGroupChat("");
 
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
@@ -176,7 +180,11 @@ const Socket: React.FC = () => {
     <div className="mx-auto max-w-7xl">
       <PageBreadcrumb pageTitle="群聊" />
 
-      <LoginDialog open={connected && !myUser} onLogin={handleLogin} />
+      <LoginDialog
+        open={showLogin}
+        onLogin={handleLogin}
+        onCancel={switchUser}
+      />
       <CreateRoomDialog
         open={showCreateRoom}
         onClose={() => setShowCreateRoom(false)}
@@ -273,20 +281,38 @@ const Socket: React.FC = () => {
                   </span>
                   {weather && <WeatherBadge weather={weather} />}
                 </div>
-                <span
-                  className={`inline-flex items-center gap-1 text-xs font-medium ${
-                    connected
-                      ? "text-green-600 dark:text-green-400"
-                      : "text-red-500 dark:text-red-400"
-                  }`}
-                >
+                <div className="flex items-center gap-3">
+                  {myUser && (
+                    <button
+                      onClick={switchUser}
+                      className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline"
+                    >
+                      当前用户：{myUser.nickname}
+                    </button>
+                  )}
+                  {mentions.length > 0 && (
+                    <span className="relative inline-flex items-center">
+                      <span className="absolute -top-1 -right-1 size-2 bg-red-500 rounded-full" />
+                      <span className="text-xs text-orange-600 dark:text-orange-400 font-medium">
+                        {mentions.length} 条@我
+                      </span>
+                    </span>
+                  )}
                   <span
-                    className={`inline-block size-1.5 rounded-full ${
-                      connected ? "bg-green-500" : "bg-red-500"
+                    className={`inline-flex items-center gap-1 text-xs font-medium ${
+                      connected
+                        ? "text-green-600 dark:text-green-400"
+                        : "text-red-500 dark:text-red-400"
                     }`}
-                  />
-                  {connected ? "已连接" : "未连接"}
-                </span>
+                  >
+                    <span
+                      className={`inline-block size-1.5 rounded-full ${
+                        connected ? "bg-green-500" : "bg-red-500"
+                      }`}
+                    />
+                    {connected ? "已连接" : "未连接"}
+                  </span>
+                </div>
               </div>
 
               {/* Messages area */}
@@ -320,6 +346,8 @@ const Socket: React.FC = () => {
                 onSend={sendMessage}
                 onlineCount={onlineUsers.length}
                 disabled={!myUser}
+                members={roomDbMembers}
+                myNickname={myUser?.nickname}
               />
             </>
           )}

@@ -8,10 +8,14 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { RoomService } from './room.service';
+import { RoomMemberService } from '../room-member/room-member.service';
 
 @Controller('rooms')
 export class RoomController {
-  constructor(private readonly roomService: RoomService) {}
+  constructor(
+    private readonly roomService: RoomService,
+    private readonly roomMemberService: RoomMemberService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -49,5 +53,11 @@ export class RoomController {
       return { errno: -1, message: '房间不存在' };
     }
     return { errno: 0, data: room };
+  }
+
+  @Get(':id/members')
+  async getMembers(@Param('id') id: string) {
+    const members = await this.roomMemberService.getMembers(id);
+    return { errno: 0, data: members };
   }
 }

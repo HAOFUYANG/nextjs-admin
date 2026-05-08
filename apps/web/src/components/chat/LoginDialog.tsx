@@ -19,9 +19,14 @@ const AVATAR_OPTIONS = Array.from({ length: 12 }, (_, i) => i + 1);
 type LoginDialogProps = {
   open: boolean;
   onLogin: (nickname: string, avatarIndex: number) => void;
+  onCancel?: () => void;
 };
 
-export default function LoginDialog({ open, onLogin }: LoginDialogProps) {
+export default function LoginDialog({
+  open,
+  onLogin,
+  onCancel,
+}: LoginDialogProps) {
   const [nickname, setNickname] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState(1);
 
@@ -90,13 +95,20 @@ export default function LoginDialog({ open, onLogin }: LoginDialogProps) {
           </div>
 
           {/* 加入按钮 */}
-          <Button
-            className="w-full"
-            onClick={handleSubmit}
-            disabled={!nickname.trim()}
-          >
-            加入群聊
-          </Button>
+          <div className="flex gap-2">
+            {onCancel && (
+              <Button variant="outline" className="flex-1" onClick={onCancel}>
+                切换用户
+              </Button>
+            )}
+            <Button
+              className="flex-1"
+              onClick={handleSubmit}
+              disabled={!nickname.trim()}
+            >
+              加入群聊
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

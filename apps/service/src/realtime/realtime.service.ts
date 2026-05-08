@@ -103,4 +103,19 @@ export class RealtimeService {
       message,
     });
   }
+
+  buildMention(room: string, from: string, content: string) {
+    return this.createEvent('server.mention', {
+      room,
+      from,
+      content,
+      time: Date.now(),
+    });
+  }
+
+  buildRoomDbMembers(
+    members: { id: string; nickname: string; avatarIndex: number }[],
+  ) {
+    return this.createEvent('server.room-db-members', members);
+  }
 }

@@ -10,6 +10,7 @@ import { DbModule } from './db/db.module';
 import { RoomModule } from './room/room.module';
 import { UserModule } from './user/user.module';
 import { MessageModule } from './message/message.module';
+import { RoomMemberModule } from './room-member/room-member.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MessageModule } from './message/message.module';
     RoomModule,
     UserModule,
     MessageModule,
+    RoomMemberModule,
   ],
   controllers: [AppController],
   providers: [

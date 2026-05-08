@@ -1,4 +1,10 @@
-import { pgTable, text, timestamp, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  integer,
+  primaryKey,
+} from 'drizzle-orm/pg-core';
 
 // 聊天房间
 export const chatRoom = pgTable('chat_room', {
@@ -36,6 +42,21 @@ export const chatMessage = pgTable('chat_message', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// 聊天房间成员关联
+export const chatRoomMember = pgTable(
+  'chat_room_member',
+  {
+    roomId: text('room_id')
+      .notNull()
+      .references(() => chatRoom.id, { onDelete: 'cascade' }),
+    userId: text('user_id')
+      .notNull()
+      .references(() => chatUser.id, { onDelete: 'cascade' }),
+    joinedAt: timestamp('joined_at').defaultNow().notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.roomId, table.userId] })],
+);
+
 // 类型导出
 export type ChatRoom = typeof chatRoom.$inferSelect;
 export type NewChatRoom = typeof chatRoom.$inferInsert;
@@ -43,3 +64,4 @@ export type ChatUserRecord = typeof chatUser.$inferSelect;
 export type NewChatUser = typeof chatUser.$inferInsert;
 export type ChatMessageRecord = typeof chatMessage.$inferSelect;
 export type NewChatMessage = typeof chatMessage.$inferInsert;
+export type ChatRoomMember = typeof chatRoomMember.$inferSelect;

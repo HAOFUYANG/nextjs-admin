@@ -40,6 +40,15 @@ export class UserStore {
     return result;
   }
 
+  findByNickname(nickname: string): ChatUser | undefined {
+    for (const user of this.users.values()) {
+      if (user.nickname === nickname) {
+        return user;
+      }
+    }
+    return undefined;
+  }
+
   remove(id: string): ChatUser | undefined {
     const user = this.users.get(id);
     if (user) {

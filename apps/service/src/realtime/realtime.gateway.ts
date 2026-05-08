@@ -17,6 +17,7 @@ import { UserStore } from './user.store';
 import { UserService } from '../user/user.service';
 import { MessageService } from '../message/message.service';
 import { RoomService } from '../room/room.service';
+import { RoomMemberService } from '../room-member/room-member.service';
 
 @Injectable()
 @WebSocketGateway({
@@ -44,6 +45,7 @@ export class RealtimeGateway
     private readonly userService: UserService,
     private readonly messageService: MessageService,
     private readonly roomService: RoomService,
+    private readonly roomMemberService: RoomMemberService,
   ) {
     super();
   }
@@ -62,6 +64,12 @@ export class RealtimeGateway
       this.server
         .to(user.room)
         .emit('server:user-left', this.realtimeService.buildUserLeft(user));
+      // Remove from DB room members
+      const dbUserId = (user as any).dbUserId;
+      const dbRoomId = (user as any).dbRoomId;
+      if (dbUserId && dbRoomId) {
+        this.roomMemberService.removeMember(dbRoomId, dbUserId).catch(() => {});
+      }
     }
     this.logger.log(`client disconnected: ${client.id}`);
   }
@@ -156,6 +164,28 @@ export class RealtimeGateway
       this.logger.error('Failed to load room history');
     }
 
+    // Persist room membership and store dbRoomId
+    let dbRoomId: string | undefined;
+    try {
+      const dbRoom = await this.roomService.findByName(room);
+      const dbUser = await this.userService.findByNickname(user.nickname);
+      if (dbRoom && dbUser) {
+        await this.roomMemberService.addMember(dbRoom.id, dbUser.id);
+        dbRoomId = dbRoom.id;
+        (user as any).dbRoomId = dbRoomId;
+        // Push DB member list to ALL users in the room (so existing users also see the new member)
+        const dbMembers = await this.roomMemberService.getMembers(dbRoom.id);
+        this.server
+          .to(room)
+          .emit(
+            'server:room-db-members',
+            this.realtimeService.buildRoomDbMembers(dbMembers),
+          );
+      }
+    } catch (err) {
+      this.logger.error('Failed to add room member');
+    }
+
     this.logger.log(`${user.nickname} joined room ${room}`);
   }
 
@@ -188,6 +218,7 @@ export class RealtimeGateway
 
     // Persist message to DB
     let dbMessageId: string | undefined;
+    let dbRoomId: string | undefined;
     try {
       const dbUser = await this.userService.findByNickname(user.nickname);
       const dbRoom = await this.roomService.findByName(room);
@@ -198,6 +229,7 @@ export class RealtimeGateway
           content,
         );
         dbMessageId = saved.id;
+        dbRoomId = dbRoom.id;
       }
     } catch (err) {
       this.logger.error('Failed to persist message to DB');
@@ -209,6 +241,27 @@ export class RealtimeGateway
       (event.data as any).id = dbMessageId;
     }
     this.server.to(room).emit('server:message', event);
+
+    // Parse @mentions and notify targeted users
+    const mentions = content.match(/@(\S+)/g);
+    if (mentions && dbRoomId) {
+      const members = await this.roomMemberService.getMembers(dbRoomId);
+      for (const m of mentions) {
+        const nickname = m.slice(1);
+        const target = members.find((u) => u.nickname === nickname);
+        if (target) {
+          const targetSocket = this.userStore.findByNickname(nickname);
+          if (targetSocket) {
+            this.server
+              .to(targetSocket.id)
+              .emit(
+                'server:mention',
+                this.realtimeService.buildMention(room, user.nickname, content),
+              );
+          }
+        }
+      }
+    }
   }
 
   @SubscribeMessage('client:ping')

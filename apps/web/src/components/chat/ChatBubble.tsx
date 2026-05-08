@@ -13,6 +13,28 @@ function formatTime(ts: number) {
   });
 }
 
+function HighlightContent({ content }: { content: string }) {
+  // Split content by @mention pattern and highlight
+  const parts = content.split(/(@\S+)/g);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (/^@\S+$/.test(part)) {
+          return (
+            <span
+              key={i}
+              className="text-blue-600 dark:text-blue-400 font-medium"
+            >
+              {part}
+            </span>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      })}
+    </>
+  );
+}
+
 function UserAvatar({
   avatarIndex,
   nickname,
@@ -53,7 +75,7 @@ function ChatBubbleMessage({
             </span>
           </div>
           <div className="rounded-xl rounded-tr-sm bg-green-500 dark:bg-green-600 px-3 py-2 text-sm text-white break-words">
-            {msg.content}
+            <HighlightContent content={msg.content!} />
           </div>
         </div>
         <UserAvatar avatarIndex={user.avatarIndex} nickname={user.nickname} />
@@ -74,7 +96,7 @@ function ChatBubbleMessage({
           </span>
         </div>
         <div className="rounded-xl rounded-tl-sm bg-white dark:bg-white/10 px-3 py-2 text-sm text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700 break-words">
-          {msg.content}
+          <HighlightContent content={msg.content!} />
         </div>
       </div>
     </div>

@@ -29,3 +29,16 @@ export async function createRoom(
   if (json.errno !== 0) throw new Error(json.message);
   return json.data;
 }
+
+export type RoomMember = {
+  id: string;
+  nickname: string;
+  avatarIndex: number;
+};
+
+export async function fetchRoomMembers(roomId: string): Promise<RoomMember[]> {
+  const res = await fetch(`${API_BASE}/rooms/${roomId}/members`);
+  const json = await res.json();
+  if (json.errno !== 0) throw new Error(json.message);
+  return json.data;
+}
