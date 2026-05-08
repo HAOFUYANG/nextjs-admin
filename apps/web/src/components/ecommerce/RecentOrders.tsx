@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import Badge from "../ui/badge/Badge";
 import Image from "next/image";
 
 // Define the TypeScript interface for the table rows
@@ -129,24 +128,16 @@ export default function RecentOrders() {
           {/* Table Header */}
           <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
             <TableRow>
-              <TableHead
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableHead className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Products
               </TableHead>
-              <TableHead
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableHead className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Category
               </TableHead>
-              <TableHead
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableHead className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Price
               </TableHead>
-              <TableHead
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableHead className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400">
                 Status
               </TableHead>
             </TableRow>
@@ -185,18 +176,17 @@ export default function RecentOrders() {
                   {product.category}
                 </TableCell>
                 <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  <Badge
-                    size="sm"
-                    color={
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
                       product.status === "Delivered"
-                        ? "success"
+                        ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                         : product.status === "Pending"
-                          ? "warning"
-                          : "error"
-                    }
+                          ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                          : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                    }`}
                   >
                     {product.status}
-                  </Badge>
+                  </span>
                 </TableCell>
               </TableRow>
             ))}
