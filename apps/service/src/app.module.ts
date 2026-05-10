@@ -11,6 +11,9 @@ import { RoomModule } from './room/room.module';
 import { UserModule } from './user/user.module';
 import { MessageModule } from './message/message.module';
 import { RoomMemberModule } from './room-member/room-member.module';
+import { RedisModule } from './redis/redis.module';
+import { WorkspaceModule } from './workspace/workspace.module';
+import { DocumentModule } from './document/document.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { RoomMemberModule } from './room-member/room-member.module';
     UserModule,
     MessageModule,
     RoomMemberModule,
+    RedisModule,
+    WorkspaceModule,
+    DocumentModule,
   ],
   controllers: [AppController],
   providers: [

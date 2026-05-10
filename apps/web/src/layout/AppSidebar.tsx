@@ -9,6 +9,7 @@ import {
   GridIcon,
   HorizontaLDots,
   PageIcon,
+  FileIcon,
 } from "../icons/index";
 
 type NavItem = {
@@ -31,6 +32,11 @@ const navItems: NavItem[] = [
       { name: "配置", path: "/config", pro: false },
       { name: "Socket", path: "/socket", pro: false },
     ],
+  },
+  {
+    name: "文档",
+    icon: <FileIcon />,
+    subItems: [{ name: "我的文档", path: "/document", pro: false, new: true }],
   },
 ];
 
