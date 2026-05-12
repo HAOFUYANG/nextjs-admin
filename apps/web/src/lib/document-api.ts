@@ -6,6 +6,7 @@ export interface DocumentRecord {
   title: string;
   type: "doc" | "table";
   snapshot: string | null;
+  content: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -73,6 +74,16 @@ export async function updateDocumentTitle(
   return request(`/documents/${id}`, {
     method: "PUT",
     body: JSON.stringify({ title }),
+  });
+}
+
+export async function updateDocumentContent(
+  id: string,
+  content: string,
+): Promise<DocumentRecord> {
+  return request(`/documents/${id}/content`, {
+    method: "PUT",
+    body: JSON.stringify({ content }),
   });
 }
 

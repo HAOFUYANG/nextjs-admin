@@ -2,10 +2,53 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useEffect } from "react";
+import Collaboration from "@tiptap/extension-collaboration";
+import { useEffect, useMemo, useRef, useState } from "react";
+import * as Y from "yjs";
+import { YjsSocketProvider, PeerInfo } from "@/lib/yjs/YjsSocketProvider";
 
 interface TiptapEditorProps {
   documentId: string;
+}
+
+const DEFAULT_CONTENT = `<h2>欢迎使用协同文档 ✨</h2>
+<p>这是一个基于 <strong>Tiptap + Yjs</strong> 的实时协同编辑器。</p>
+<p>多端同时打开本页，内容会通过 Socket.IO 实时广播合并。</p>
+<h3>使用说明</h3>
+<ul>
+  <li>✅ 实时协同编辑（Yjs CRDT）</li>
+  <li>✅ 增量 update + snapshot 持久化</li>
+  <li>✅ 在线用户头像（右上角）</li>
+  <li>🔜 协同光标（下个阶段）</li>
+</ul>`;
+
+const COLOR_PALETTE = [
+  "#F97316",
+  "#22C55E",
+  "#3B82F6",
+  "#EAB308",
+  "#EF4444",
+  "#14B8A6",
+  "#A855F7",
+  "#EC4899",
+];
+
+function hashColor(name: string): string {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return COLOR_PALETTE[h % COLOR_PALETTE.length];
+}
+
+function getLocalUser(): { name: string; color: string } {
+  if (typeof window === "undefined") return { name: "User", color: "#3B82F6" };
+  let name = window.localStorage.getItem("doc-comment-user")?.trim();
+  if (!name) {
+    name = `用户${Math.floor(Math.random() * 1000)}`;
+    try {
+      window.localStorage.setItem("doc-comment-user", name);
+    } catch {}
+  }
+  return { name, color: hashColor(name) };
 }
 
 function ToolbarButton({
@@ -35,30 +78,100 @@ function ToolbarButton({
   );
 }
 
+function PeerAvatars({ peers }: { peers: PeerInfo[] }) {
+  if (!peers.length) return null;
+  return (
+    <div className="flex -space-x-2 ml-2">
+      {peers.slice(0, 6).map((p) => (
+        <div
+          key={p.socketId}
+          title={p.name}
+          className="w-7 h-7 rounded-full border-2 border-white dark:border-gray-900 flex items-center justify-center text-[11px] font-semibold text-white"
+          style={{ background: p.color }}
+        >
+          {p.name.slice(0, 2)}
+        </div>
+      ))}
+      {peers.length > 6 && (
+        <div className="w-7 h-7 rounded-full border-2 border-white dark:border-gray-900 bg-gray-300 text-gray-700 text-[11px] flex items-center justify-center">
+          +{peers.length - 6}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function TiptapEditor({ documentId }: TiptapEditorProps) {
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: `<h2>欢迎使用协同文档 ✨</h2>
-<p>这是一个基于 <strong>Tiptap</strong> 的富文本编辑器，后续会接入 Yjs 实现多人实时协同。</p>
-<p>当前为 <em>预览模式</em>，你可以自由编辑内容（暂不同步到服务端）。</p>
-<h3>功能规划</h3>
-<ul>
-  <li>✅ 富文本编辑（粗体、斜体、标题、列表）</li>
-  <li>🔜 多人实时协同（Yjs + Socket.IO）</li>
-  <li>🔜 协同光标显示</li>
-  <li>🔜 评论与讨论</li>
-</ul>`,
-    editorProps: {
-      attributes: {
-        class:
-          "prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none max-w-none min-h-[500px] px-8 py-6",
-      },
-    },
-  });
+  // 每次 documentId 变化，重建 ydoc + provider
+  const { ydoc, provider } = useMemo(() => {
+    const localUser = getLocalUser();
+    const doc = new Y.Doc();
+    const p = new YjsSocketProvider({
+      documentId,
+      user: localUser,
+      doc,
+    });
+    return { ydoc: doc, provider: p };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documentId]);
+
+  const [peers, setPeers] = useState<PeerInfo[]>([]);
+  const [synced, setSynced] = useState(false);
+  const seededRef = useRef(false);
 
   useEffect(() => {
-    console.log("[TiptapEditor] documentId:", documentId);
-  }, [documentId]);
+    const offPeers = provider.onPeersChange(setPeers);
+    const offSynced = provider.onSyncedChange(setSynced);
+    return () => {
+      offPeers();
+      offSynced();
+    };
+  }, [provider]);
+
+  // 卸载时销毁 provider + doc
+  useEffect(() => {
+    return () => {
+      provider.destroy();
+      ydoc.destroy();
+    };
+  }, [provider, ydoc]);
+
+  const editor = useEditor(
+    {
+      extensions: [
+        // StarterKit 自带的 undoRedo 与 Yjs undo 冲突，必须禁用
+        StarterKit.configure({ undoRedo: false }),
+        Collaboration.configure({ document: ydoc }),
+      ],
+      immediatelyRender: false,
+      editorProps: {
+        attributes: {
+          class:
+            "prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none max-w-none min-h-[500px] px-8 py-6",
+        },
+      },
+    },
+    [ydoc],
+  );
+
+  // 首次 sync 完成后，若文档为空且房间只有自己，则插入默认内容
+  useEffect(() => {
+    if (!editor || !synced || seededRef.current) return;
+    if (peers.length > 1) {
+      seededRef.current = true;
+      return;
+    }
+    const frag = ydoc.getXmlFragment("default");
+    const isEmpty = frag.length === 0;
+    const editorEmpty =
+      editor.state.doc.childCount === 0 ||
+      (editor.state.doc.childCount === 1 &&
+        editor.state.doc.firstChild?.content.size === 0);
+    if (isEmpty && editorEmpty) {
+      editor.commands.setContent(DEFAULT_CONTENT);
+    }
+    seededRef.current = true;
+  }, [editor, synced, peers, ydoc]);
 
   if (!editor) return null;
 
@@ -152,6 +265,21 @@ export default function TiptapEditor({ documentId }: TiptapEditorProps) {
         >
           ―
         </ToolbarButton>
+
+        {/* 协同状态 */}
+        <div className="ml-auto flex items-center gap-2">
+          <span
+            className={`text-xs px-2 py-0.5 rounded ${
+              synced
+                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                : "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400"
+            }`}
+            title={synced ? "已与服务端同步" : "等待同步…"}
+          >
+            {synced ? "● 已同步" : "○ 同步中"}
+          </span>
+          <PeerAvatars peers={peers} />
+        </div>
       </div>
 
       {/* 编辑区域 */}

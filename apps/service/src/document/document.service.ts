@@ -53,6 +53,18 @@ export class DocumentService {
     return updated;
   }
 
+  async updateContent(
+    id: string,
+    content: string,
+  ): Promise<DocumentRecord | undefined> {
+    const [updated] = await this.db
+      .update(document)
+      .set({ content, updatedAt: new Date() })
+      .where(eq(document.id, id))
+      .returning();
+    return updated;
+  }
+
   async deleteById(id: string): Promise<boolean> {
     const result = await this.db
       .delete(document)

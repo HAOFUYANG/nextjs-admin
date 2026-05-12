@@ -10,6 +10,7 @@ import {
 } from "@/lib/document-api";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
+import { MessageSquareIcon } from "lucide-react";
 
 // 动态导入编辑器组件（避免 SSR 问题）
 const TiptapEditor = dynamic(
@@ -21,6 +22,16 @@ const CanvasTable = dynamic(
   () => import("@/components/document/CollaborativeTable/CanvasTableView"),
   { ssr: false, loading: () => <EditorSkeleton /> },
 ) as React.ComponentType<{ documentId: string }>;
+
+const CommentPanel = dynamic(
+  () => import("@/components/document/CommentPanel"),
+  { ssr: false },
+) as React.ComponentType<{
+  documentId: string;
+  blockId?: string;
+  open: boolean;
+  onClose: () => void;
+}>;
 
 function EditorSkeleton() {
   return (
@@ -38,6 +49,7 @@ export default function DocumentEditorPage() {
   const [loading, setLoading] = useState(true);
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleValue, setTitleValue] = useState("");
+  const [commentOpen, setCommentOpen] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -158,8 +170,16 @@ export default function DocumentEditorPage() {
         </span>
 
         <button
+          onClick={() => setCommentOpen(true)}
+          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition"
+          title="打开评论面板"
+        >
+          <MessageSquareIcon className="w-4 h-4" />
+          评论
+        </button>
+        <button
           onClick={() => router.push("/document")}
-          className="ml-auto text-sm text-gray-400 hover:text-gray-600"
+          className="text-sm text-gray-400 hover:text-gray-600"
         >
           返回列表
         </button>
@@ -173,6 +193,13 @@ export default function DocumentEditorPage() {
           <CanvasTable documentId={doc.id} />
         )}
       </div>
+
+      {/* 评论面板 */}
+      <CommentPanel
+        documentId={doc.id}
+        open={commentOpen}
+        onClose={() => setCommentOpen(false)}
+      />
     </div>
   );
 }

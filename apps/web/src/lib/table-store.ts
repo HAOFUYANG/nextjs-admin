@@ -415,7 +415,15 @@ interface TableState {
   removeFilter: (fieldId: string) => void;
   updateFilter: (fieldId: string, partial: Partial<FilterConfig>) => void;
   clearFilters: () => void;
+
+  /** 从后端 snapshot 加载数据，重置整个 store 为给定状态 */
+  loadData: (payload: { fields: FieldConfig[]; records: RecordData[] }) => void;
+  /** 导出当前数据快照（用于持久化到后端） */
+  exportSnapshot: () => { fields: FieldConfig[]; records: RecordData[] };
 }
+
+export const DEFAULT_TABLE_FIELDS = SAMPLE_FIELDS;
+export const DEFAULT_TABLE_RECORDS = SAMPLE_RECORDS;
 
 export const useTableStore = create<TableState>((set, get) => ({
   fields: SAMPLE_FIELDS,
@@ -533,6 +541,24 @@ export const useTableStore = create<TableState>((set, get) => ({
       ),
     })),
   clearFilters: () => set({ filterConfigs: [] }),
+
+  loadData: ({ fields, records }) =>
+    set({
+      fields,
+      records,
+      selectedCell: null,
+      editingCell: null,
+      hoverCell: null,
+      headerMenuFieldId: null,
+      scrollOffset: { x: 0, y: 0 },
+      sortConfig: null,
+      filterConfigs: [],
+    }),
+
+  exportSnapshot: () => {
+    const { fields, records } = get();
+    return { fields, records };
+  },
 }));
 
 // ---- Selector 函数 ----

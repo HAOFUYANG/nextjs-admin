@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
+import * as Y from "yjs";
 import {
   useTableStore,
   selectVisibleFields,
   selectSortedRecords,
   FIELD_TYPE_ICONS,
+  DEFAULT_TABLE_FIELDS,
+  DEFAULT_TABLE_RECORDS,
   type FieldConfig,
   type CellValue,
   type SelectOption,
@@ -13,7 +16,59 @@ import {
   type SortConfig,
   type FilterConfig,
 } from "@/lib/table-store";
+import { YjsSocketProvider, type PeerInfo } from "@/lib/yjs/YjsSocketProvider";
+import { bindTableStoreToYDoc } from "@/lib/yjs/table-yjs-bridge";
 import TableToolbar from "./TableToolbar";
+
+// ---- 在线用户头像 ----
+const PEER_COLOR_PALETTE = [
+  "#F97316",
+  "#22C55E",
+  "#3B82F6",
+  "#EAB308",
+  "#EF4444",
+  "#14B8A6",
+  "#A855F7",
+  "#EC4899",
+];
+function hashColor(name: string): string {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return PEER_COLOR_PALETTE[h % PEER_COLOR_PALETTE.length];
+}
+function getLocalUser(): { name: string; color: string } {
+  if (typeof window === "undefined") return { name: "User", color: "#3B82F6" };
+  let name = window.localStorage.getItem("doc-comment-user")?.trim();
+  if (!name) {
+    name = `用户${Math.floor(Math.random() * 1000)}`;
+    try {
+      window.localStorage.setItem("doc-comment-user", name);
+    } catch {}
+  }
+  return { name, color: hashColor(name) };
+}
+function PeerAvatars({ peers }: { peers: PeerInfo[] }) {
+  if (!peers.length) return null;
+  return (
+    <div className="flex -space-x-2">
+      {peers.slice(0, 6).map((p) => (
+        <div
+          key={p.socketId}
+          title={p.name}
+          className="w-6 h-6 rounded-full border-2 border-white dark:border-gray-900 flex items-center justify-center text-[10px] font-semibold text-white"
+          style={{ background: p.color }}
+        >
+          {p.name.slice(0, 2)}
+        </div>
+      ))}
+      {peers.length > 6 && (
+        <div className="w-6 h-6 rounded-full border-2 border-white dark:border-gray-900 bg-gray-300 text-gray-700 text-[10px] flex items-center justify-center">
+          +{peers.length - 6}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ---- 颜色常量 ----
 
@@ -24,6 +79,9 @@ const COLORS = {
   rowBg: "#ffffff",
   rowBgAlt: "#fafbfc",
   rowHover: "#f0f5ff",
+  rowNumberBg: "#f7f8fa",
+  rowNumberHoverBg: "#e1ebff",
+  rowNumberActive: "#1a73e8",
   cellSelected: "#e8f0fe",
   cellSelectedBorder: "#1a73e8",
   text: "#1f2329",
@@ -43,6 +101,58 @@ const FONT_FAMILY =
 
 function getTextWidth(ctx: CanvasRenderingContext2D, text: string): number {
   return ctx.measureText(text).width;
+}
+
+// 单元格复制：将 CellValue 序列化为纯文本（可与 Excel 互通）
+function serializeCellForCopy(
+  field: FieldConfig,
+  value: CellValue | undefined,
+): string {
+  if (value === null || value === undefined) return "";
+  if (field.type === "checkbox") return value ? "true" : "false";
+  if (Array.isArray(value)) {
+    return value.map((o) => o.label).join(", ");
+  }
+  return String(value);
+}
+
+// 单元格粘贴：根据字段类型解析文本为 CellValue
+function parseCellFromPaste(field: FieldConfig, text: string): CellValue {
+  const trimmed = text.replace(/\r?\n$/, "");
+  switch (field.type) {
+    case "number":
+    case "progress": {
+      const n = Number(trimmed);
+      if (Number.isNaN(n)) return 0;
+      return field.type === "progress" ? Math.min(100, Math.max(0, n)) : n;
+    }
+    case "rating": {
+      const n = Number(trimmed);
+      if (Number.isNaN(n)) return 0;
+      return Math.min(5, Math.max(0, Math.round(n)));
+    }
+    case "checkbox": {
+      const v = trimmed.toLowerCase();
+      return v === "true" || v === "1" || v === "✓" || v === "yes";
+    }
+    case "select": {
+      const label = trimmed.trim();
+      const opt = field.options?.find((o) => o.label === label);
+      return opt ? [opt] : [];
+    }
+    case "multiSelect": {
+      const labels = trimmed
+        .split(/[,\uFF0C\t]/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const opts = labels
+        .map((l) => field.options?.find((o) => o.label === l))
+        .filter((o): o is SelectOption => !!o);
+      return opts;
+    }
+    default:
+      return trimmed;
+  }
 }
 
 function truncateText(
@@ -281,11 +391,25 @@ class TableRenderer {
       }
       ctx.fillRect(0, y, canvasWidth, rowHeight);
 
+      // 行号列背景（在行背景之上叠加一层，突出左侧）
+      if (isSelectedRow || isHoverRow) {
+        ctx.fillStyle = COLORS.rowNumberHoverBg;
+      } else {
+        ctx.fillStyle = COLORS.rowNumberBg;
+      }
+      ctx.fillRect(0, y, rowNumberWidth, rowHeight);
+
       // 行号
-      ctx.font = `12px ${FONT_FAMILY}`;
-      ctx.fillStyle = COLORS.rowNumber;
+      ctx.font =
+        isHoverRow || isSelectedRow
+          ? `600 12px ${FONT_FAMILY}`
+          : `12px ${FONT_FAMILY}`;
+      ctx.fillStyle =
+        isSelectedRow || isHoverRow ? COLORS.rowNumberActive : COLORS.rowNumber;
       ctx.textBaseline = "middle";
-      ctx.fillText(String(rowIdx + 1), 8, y + rowHeight / 2);
+      ctx.textAlign = "center";
+      ctx.fillText(String(rowIdx + 1), rowNumberWidth / 2, y + rowHeight / 2);
+      ctx.textAlign = "left";
 
       // 行号列边线
       ctx.strokeStyle = COLORS.gridLine;
@@ -605,8 +729,8 @@ class TableRenderer {
 
     const recordId = records[rowIdx].id;
     if (mouseX < rowNumberWidth) {
-      // 点击行号列
-      return { type: "cell", recordId, fieldId: fields[0]?.id };
+      // 行号列：返回仅包含 recordId（不绑定字段，避免单元格进入 hover 高亮）
+      return { type: "cell", recordId };
     }
 
     for (let i = 0; i < fields.length; i++) {
@@ -616,6 +740,28 @@ class TableRenderer {
       }
     }
 
+    return null;
+  }
+
+  /** 检测鼠标是否在某列的右边界附近（可用于列宽拖拽） */
+  hitColumnResize(
+    mouseX: number,
+    mouseY: number,
+    scrollX: number,
+    fields: FieldConfig[],
+    rowNumberWidth: number,
+    headerHeight: number,
+    tolerance = 5,
+  ): { fieldId: string; startWidth: number } | null {
+    // 仅在表头区域内触发
+    if (mouseY < 0 || mouseY > headerHeight) return null;
+    for (let i = 0; i < fields.length; i++) {
+      const right =
+        this.getColX(fields, i, rowNumberWidth) + fields[i].width - scrollX;
+      if (Math.abs(mouseX - right) <= tolerance) {
+        return { fieldId: fields[i].id, startWidth: fields[i].width };
+      }
+    }
     return null;
   }
 }
@@ -648,12 +794,21 @@ export default function CanvasTableView({ documentId }: CanvasTableViewProps) {
     setEditingCell,
     setHoverCell,
     updateCell,
+    updateField,
     setHeaderMenuFieldId,
     setSortConfig,
     addFilter,
     removeFilter,
     clearFilters,
   } = useTableStore();
+
+  // 列宽拖拽状态
+  const [resizing, setResizing] = useState<{
+    fieldId: string;
+    startMouseX: number;
+    startWidth: number;
+  } | null>(null);
+  const [cursorStyle, setCursorStyle] = useState<string>("default");
 
   // 可见字段
   const visibleFields = useMemo(
@@ -832,6 +987,30 @@ export default function CanvasTableView({ documentId }: CanvasTableViewProps) {
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
 
+      // 列宽拖拽进行中
+      if (resizing) {
+        const delta = mouseX - resizing.startMouseX;
+        const newWidth = Math.max(60, resizing.startWidth + delta);
+        updateField(resizing.fieldId, { width: newWidth });
+        setCursorStyle("col-resize");
+        return;
+      }
+
+      // 检测列宽拖拽热区
+      const resizeHit = rendererRef.current.hitColumnResize(
+        mouseX,
+        mouseY,
+        scrollOffset.x,
+        visibleFields,
+        ROW_NUMBER_WIDTH,
+        HEADER_HEIGHT,
+      );
+      if (resizeHit) {
+        setCursorStyle("col-resize");
+      } else {
+        setCursorStyle("default");
+      }
+
       const hit = rendererRef.current.hitTest(
         mouseX,
         mouseY,
@@ -855,6 +1034,8 @@ export default function CanvasTableView({ documentId }: CanvasTableViewProps) {
       }
     },
     [
+      resizing,
+      updateField,
       scrollOffset,
       visibleFields,
       records,
@@ -865,10 +1046,50 @@ export default function CanvasTableView({ documentId }: CanvasTableViewProps) {
     ],
   );
 
+  // 按下：如在列边界附近，进入 resize 模式
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      const canvas = canvasRef.current;
+      if (!canvas || !rendererRef.current) return;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const resizeHit = rendererRef.current.hitColumnResize(
+        mouseX,
+        mouseY,
+        scrollOffset.x,
+        visibleFields,
+        ROW_NUMBER_WIDTH,
+        HEADER_HEIGHT,
+      );
+      if (resizeHit) {
+        e.preventDefault();
+        setResizing({
+          fieldId: resizeHit.fieldId,
+          startMouseX: mouseX,
+          startWidth: resizeHit.startWidth,
+        });
+        setCursorStyle("col-resize");
+      }
+    },
+    [scrollOffset, visibleFields, ROW_NUMBER_WIDTH, HEADER_HEIGHT],
+  );
+
+  // 松开：退出 resize 模式
+  const handleMouseUp = useCallback(() => {
+    if (resizing) {
+      setResizing(null);
+      setCursorStyle("default");
+    }
+  }, [resizing]);
+
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
       // 忽略双击时触发的第二次 click
       if (e.detail === 2) return;
+
+      // 让容器获得焦点，便于键盘导航和 Ctrl/Cmd+C/V
+      containerRef.current?.focus({ preventScroll: true });
 
       const canvas = canvasRef.current;
       if (!canvas || !rendererRef.current) return;
@@ -889,16 +1110,23 @@ export default function CanvasTableView({ documentId }: CanvasTableViewProps) {
         ROW_NUMBER_WIDTH,
       );
 
-      if (hit?.type === "cell" && hit.fieldId && hit.recordId) {
-        setSelectedCell({ fieldId: hit.fieldId, recordId: hit.recordId });
+      if (hit?.type === "cell" && hit.recordId) {
+        // 行号列点击：默认选中第一列单元格
+        const fieldId = hit.fieldId ?? visibleFields[0]?.id;
+        if (!fieldId) {
+          setSelectedCell(null);
+          setEditingCell(null);
+          return;
+        }
+        setSelectedCell({ fieldId, recordId: hit.recordId });
         setEditingCell(null);
 
         // checkbox 直接切换
-        const field = visibleFields.find((f) => f.id === hit.fieldId);
+        const field = visibleFields.find((f) => f.id === fieldId);
         if (field?.type === "checkbox") {
           const record = records.find((r) => r.id === hit.recordId);
           if (record) {
-            updateCell(hit.recordId, hit.fieldId, !record.values[hit.fieldId]);
+            updateCell(hit.recordId, fieldId, !record.values[fieldId]);
           }
         }
       } else if (hit?.type === "header" && hit.fieldId) {
@@ -966,12 +1194,70 @@ export default function CanvasTableView({ documentId }: CanvasTableViewProps) {
 
   const handleMouseLeave = useCallback(() => {
     setHoverCell(null);
-  }, [setHoverCell]);
+    if (!resizing) setCursorStyle("default");
+  }, [setHoverCell, resizing]);
+
+  // 全局 mouseup：处理拖出容器后松开的情形
+  useEffect(() => {
+    if (!resizing) return;
+    const onUp = () => {
+      setResizing(null);
+      setCursorStyle("default");
+    };
+    const onMove = (e: MouseEvent) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const delta = mouseX - resizing.startMouseX;
+      const newWidth = Math.max(60, resizing.startWidth + delta);
+      updateField(resizing.fieldId, { width: newWidth });
+    };
+    window.addEventListener("mouseup", onUp);
+    window.addEventListener("mousemove", onMove);
+    return () => {
+      window.removeEventListener("mouseup", onUp);
+      window.removeEventListener("mousemove", onMove);
+    };
+  }, [resizing, updateField]);
 
   // 键盘导航
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (!selectedCell) return;
+
+      // 复制 / 粘贴（在编辑模式下不处理，交给 overlay 自己）
+      if ((e.metaKey || e.ctrlKey) && !editingCell) {
+        const key = e.key.toLowerCase();
+        if (key === "c") {
+          e.preventDefault();
+          const rec = records.find((r) => r.id === selectedCell.recordId);
+          const fld = visibleFields.find((f) => f.id === selectedCell.fieldId);
+          if (rec && fld) {
+            const text = serializeCellForCopy(fld, rec.values[fld.id]);
+            void navigator.clipboard?.writeText(text).catch(() => {});
+          }
+          return;
+        }
+        if (key === "v") {
+          e.preventDefault();
+          const sel = selectedCell;
+          void (async () => {
+            try {
+              const txt = await navigator.clipboard.readText();
+              const fld = visibleFields.find((f) => f.id === sel.fieldId);
+              if (fld) {
+                updateCell(
+                  sel.recordId,
+                  sel.fieldId,
+                  parseCellFromPaste(fld, txt),
+                );
+              }
+            } catch {}
+          })();
+          return;
+        }
+      }
 
       const recIdx = records.findIndex((r) => r.id === selectedCell.recordId);
       const fldIdx = visibleFields.findIndex(
@@ -1037,21 +1323,88 @@ export default function CanvasTableView({ documentId }: CanvasTableViewProps) {
       visibleFields,
       setSelectedCell,
       setEditingCell,
+      updateCell,
     ],
   );
 
-  // documentId 保留供后续 Yjs 集成使用
-  void documentId;
+  // ---- Yjs 协同同步 ----
+  // 每次 documentId 变化，重建 ydoc + provider
+  const { ydoc, provider } = useMemo(() => {
+    const localUser = getLocalUser();
+    const doc = new Y.Doc();
+    const p = new YjsSocketProvider({
+      documentId,
+      user: localUser,
+      doc,
+    });
+    return { ydoc: doc, provider: p };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [documentId]);
+
+  const [peers, setPeers] = useState<PeerInfo[]>([]);
+  const [synced, setSynced] = useState(false);
+  const bindingRef = useRef<{ unbind: () => void } | null>(null);
+
+  useEffect(() => {
+    const offPeers = provider.onPeersChange(setPeers);
+    const offSynced = provider.onSyncedChange(setSynced);
+    return () => {
+      offPeers();
+      offSynced();
+    };
+  }, [provider]);
+
+  // 首次 sync 后绑定 store 与 ydoc；若远程为空且只有自己 → seed 默认数据
+  useEffect(() => {
+    if (!synced) return;
+    if (bindingRef.current) return;
+
+    const isSolePeer = peers.length <= 1;
+    const binding = bindTableStoreToYDoc(ydoc, {
+      seedIfEmpty: isSolePeer
+        ? { fields: DEFAULT_TABLE_FIELDS, records: DEFAULT_TABLE_RECORDS }
+        : null,
+    });
+    bindingRef.current = binding;
+
+    return () => {
+      binding.unbind();
+      bindingRef.current = null;
+    };
+  }, [synced, peers.length, ydoc]);
+
+  // 卸载时销毁 provider + doc
+  useEffect(() => {
+    return () => {
+      bindingRef.current?.unbind();
+      bindingRef.current = null;
+      provider.destroy();
+      ydoc.destroy();
+    };
+  }, [provider, ydoc]);
 
   return (
     <div className="flex flex-col w-full h-full">
+      {/* 同步状态条 + 在线用户 */}
+      <div className="flex items-center justify-between px-4 py-1 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+        <div className="flex items-center gap-2 text-xs">
+          <span
+            className={`inline-block w-2 h-2 rounded-full ${
+              synced ? "bg-green-500" : "bg-gray-300 animate-pulse"
+            }`}
+          />
+          <span className="text-gray-500">{synced ? "已同步" : "连接中…"}</span>
+        </div>
+        <PeerAvatars peers={peers} />
+      </div>
+
       {/* 工具栏 */}
       <TableToolbar documentId={documentId} />
 
       {/* Canvas 区域 */}
       <div
         ref={containerRef}
-        className="relative flex-1 min-h-0 overflow-hidden"
+        className="relative flex-1 min-h-0 overflow-hidden select-none"
         tabIndex={0}
         onKeyDown={handleKeyDown}
       >
@@ -1065,8 +1418,11 @@ export default function CanvasTableView({ documentId }: CanvasTableViewProps) {
         {/* 滚动容器（透明，仅用于撑出滚动条和触发 scroll 事件） */}
         <div
           className="absolute inset-0 overflow-auto z-20"
+          style={{ cursor: cursorStyle }}
           onScroll={handleScroll}
           onMouseMove={handleMouseMove}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
           onClick={handleClick}
           onDoubleClick={handleDoubleClick}
           onMouseLeave={handleMouseLeave}
@@ -1141,7 +1497,12 @@ function CellEditorOverlay({
   };
 
   return (
-    <div className="absolute z-50" style={{ left: rect.x, top: rect.y }}>
+    <div
+      className="absolute z-50 select-text"
+      style={{ left: rect.x, top: rect.y }}
+      onMouseDown={(e) => e.stopPropagation()}
+      onDoubleClick={(e) => e.stopPropagation()}
+    >
       {field.type === "select" || field.type === "multiSelect" ? (
         <SelectEditor {...editorProps} />
       ) : field.type === "date" ? (

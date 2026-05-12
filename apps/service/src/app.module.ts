@@ -14,6 +14,7 @@ import { RoomMemberModule } from './room-member/room-member.module';
 import { RedisModule } from './redis/redis.module';
 import { WorkspaceModule } from './workspace/workspace.module';
 import { DocumentModule } from './document/document.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { DocumentModule } from './document/document.module';
     RedisModule,
     WorkspaceModule,
     DocumentModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [

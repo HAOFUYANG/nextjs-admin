@@ -106,7 +106,8 @@ export const document = pgTable('document', {
     .references(() => workspace.id, { onDelete: 'cascade' }),
   title: text('title').notNull().default('Untitled'),
   type: text('type', { enum: ['doc', 'table'] }).notNull(), // doc=富文本, table=多维表格
-  snapshot: bytea('snapshot'), // Yjs state vector snapshot
+  snapshot: bytea('snapshot'), // Yjs state vector snapshot（预留，后续协同使用）
+  content: text('content'), // 当前阶段以 JSON/HTML 字符串存储文档实际内容
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });

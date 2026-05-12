@@ -65,6 +65,21 @@ export class DocumentController {
     return { errno: 0, data: doc };
   }
 
+  @Put(':id/content')
+  async updateContent(
+    @Param('id') id: string,
+    @Body() body: { content: string },
+  ) {
+    if (typeof body?.content !== 'string') {
+      return { errno: -1, message: 'content is required' };
+    }
+    const doc = await this.documentService.updateContent(id, body.content);
+    if (!doc) {
+      return { errno: -1, message: '文档不存在' };
+    }
+    return { errno: 0, data: doc };
+  }
+
   @Delete(':id')
   async deleteById(@Param('id') id: string) {
     const deleted = await this.documentService.deleteById(id);
